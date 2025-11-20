@@ -47,7 +47,7 @@ const SHELL_COMMANDS: Record<string, ShellCommand> = {
 export class ShellCommandAnalyzer {
   private issues: ShellCommandIssue[] = [];
 
-  analyzeCode(code: string, filePath: string): ShellCommandIssue[] {
+  analyzeCode(code: string, _filePath: string): ShellCommandIssue[] {
     this.issues = [];
 
     const lines = code.split('\n');
@@ -75,7 +75,7 @@ export class ShellCommandAnalyzer {
     return this.issues;
   }
 
-  analyzeShellScript(scriptContent: string, filePath: string): ShellCommandIssue[] {
+  analyzeShellScript(scriptContent: string, _filePath: string): ShellCommandIssue[] {
     this.issues = [];
 
     const lines = scriptContent.split('\n');

@@ -3,28 +3,23 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { OptimistServer } from './server.js';
-import { PerformanceAnalyzer } from './tools/performance.js';
-import { MemoryOptimizer } from './tools/memory.js';
-import { ComplexityAnalyzer } from './tools/complexity.js';
-import { CodeSmellDetector } from './tools/code-smells.js';
-import { RefactoringSuggester } from './tools/refactoring.js';
+import { XPlatformServer } from './server.js';
+import { detectPlatformAPIs } from './tools/platform-apis.js';
+import { analyzeFilePaths } from './tools/file-paths.js';
+import { analyzeLineEndings } from './tools/line-endings.js';
+import { analyzeShellCommands } from './tools/shell-commands.js';
+import { generateCompatibilityReport } from './tools/compatibility-report.js';
 
 /**
- * Main entry point for the Optimist MCP server
+ * Main entry point for the X-Platform MCP server
  */
 async function main() {
-  const optimist = new OptimistServer();
-  const performanceAnalyzer = new PerformanceAnalyzer();
-  const memoryOptimizer = new MemoryOptimizer();
-  const complexityAnalyzer = new ComplexityAnalyzer();
-  const codeSmellDetector = new CodeSmellDetector();
-  const refactoringSuggester = new RefactoringSuggester();
+  const xplatform = new XPlatformServer();
 
   const server = new Server(
     {
-      name: optimist.name,
-      version: optimist.version,
+      name: xplatform.name,
+      version: xplatform.version,
     },
     {
       capabilities: {
@@ -35,7 +30,7 @@ async function main() {
 
   // Handle list_tools request
   server.setRequestHandler(ListToolsRequestSchema, async () => {
-    const tools = optimist.listTools();
+    const tools = xplatform.listTools();
     return { tools };
   });
 
@@ -45,12 +40,8 @@ async function main() {
 
     try {
       switch (name) {
-        case 'analyze_performance': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const result = await performanceAnalyzer.analyze(path);
+        case 'detect_platform_apis': {
+          const result = await detectPlatformAPIs(args as any);
           return {
             content: [
               {
@@ -61,16 +52,8 @@ async function main() {
           };
         }
 
-        case 'optimize_memory': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            detectLeaks: (args as any).detectLeaks,
-            suggestFixes: (args as any).suggestFixes,
-          };
-          const result = await memoryOptimizer.analyze(path, options);
+        case 'analyze_file_paths': {
+          const result = await analyzeFilePaths(args as any);
           return {
             content: [
               {
@@ -81,16 +64,8 @@ async function main() {
           };
         }
 
-        case 'analyze_complexity': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            maxComplexity: (args as any).maxComplexity,
-            reportFormat: (args as any).reportFormat,
-          };
-          const result = await complexityAnalyzer.analyze(path, options);
+        case 'analyze_line_endings': {
+          const result = await analyzeLineEndings(args as any);
           return {
             content: [
               {
@@ -101,15 +76,8 @@ async function main() {
           };
         }
 
-        case 'detect_code_smells': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            severity: (args as any).severity,
-          };
-          const result = await codeSmellDetector.analyze(path, options);
+        case 'analyze_shell_commands': {
+          const result = await analyzeShellCommands(args as any);
           return {
             content: [
               {
@@ -120,15 +88,8 @@ async function main() {
           };
         }
 
-        case 'suggest_refactoring': {
-          const path = (args as any).path;
-          if (!path) {
-            throw new Error('Missing required argument: path');
-          }
-          const options = {
-            focusArea: (args as any).focusArea,
-          };
-          const result = await refactoringSuggester.analyze(path, options);
+        case 'generate_compatibility_report': {
+          const result = await generateCompatibilityReport(args as any);
           return {
             content: [
               {
@@ -140,8 +101,8 @@ async function main() {
         }
 
         case 'analyze_dependencies':
-        case 'find_dead_code':
-        case 'optimize_hot_paths': {
+        case 'analyze_build_systems':
+        case 'detect_encoding_issues': {
           return {
             content: [
               {
@@ -157,7 +118,7 @@ async function main() {
             content: [
               {
                 type: 'text',
-                text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
+                text: `Unknown tool: '${name}'`,
               },
             ],
           };
@@ -181,7 +142,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('Optimist MCP server running on stdio');
+  console.error('X-Platform MCP server running on stdio');
 }
 
 main().catch((error) => {
