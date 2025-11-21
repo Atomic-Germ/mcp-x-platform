@@ -1,10 +1,15 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 export interface FilePathIssue {
-  type: 'file-path';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  issue: 'separator' | 'case-sensitivity' | 'reserved-name' | 'absolute-path' | 'special-chars';
+  type: "file-path";
+  severity: "low" | "medium" | "high" | "critical";
+  issue:
+    | "separator"
+    | "case-sensitivity"
+    | "reserved-name"
+    | "absolute-path"
+    | "special-chars";
   filePath: string;
   location?: { line: number; column: number };
   message: string;
@@ -15,9 +20,28 @@ export interface FilePathIssue {
  * Windows reserved file names
  */
 const WINDOWS_RESERVED_NAMES = [
-  'CON', 'PRN', 'AUX', 'NUL',
-  'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
-  'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9',
+  "CON",
+  "PRN",
+  "AUX",
+  "NUL",
+  "COM1",
+  "COM2",
+  "COM3",
+  "COM4",
+  "COM5",
+  "COM6",
+  "COM7",
+  "COM8",
+  "COM9",
+  "LPT1",
+  "LPT2",
+  "LPT3",
+  "LPT4",
+  "LPT5",
+  "LPT6",
+  "LPT7",
+  "LPT8",
+  "LPT9",
 ];
 
 /**
@@ -59,24 +83,25 @@ export class FilePathAnalyzer {
         // Check for reserved names
         if (this.isReservedName(entry.name)) {
           this.issues.push({
-            type: 'file-path',
-            severity: 'critical',
-            issue: 'reserved-name',
+            type: "file-path",
+            severity: "critical",
+            issue: "reserved-name",
             filePath: fullPath,
             message: `File/directory name "${entry.name}" is reserved on Windows`,
-            suggestion: 'Rename to avoid Windows reserved names',
+            suggestion: "Rename to avoid Windows reserved names",
           });
         }
 
         // Check for problematic characters
         if (this.hasSpecialCharacters(entry.name)) {
           this.issues.push({
-            type: 'file-path',
-            severity: 'medium',
-            issue: 'special-chars',
+            type: "file-path",
+            severity: "medium",
+            issue: "special-chars",
             filePath: fullPath,
             message: `File/directory name contains special characters: "${entry.name}"`,
-            suggestion: 'Use alphanumeric characters, hyphens, and underscores only',
+            suggestion:
+              "Use alphanumeric characters, hyphens, and underscores only",
           });
         }
 
@@ -94,65 +119,69 @@ export class FilePathAnalyzer {
   }
 
   private checkPathSeparators(code: string, filePath: string): void {
-    const lines = code.split('\n');
-    
+    const lines = code.split("\n");
+
     lines.forEach((line, index) => {
       // Look for hardcoded backslashes in strings
       const backslashMatches = line.match(/['"`].*\\+.*['"`]/g);
       if (backslashMatches) {
         this.issues.push({
-          type: 'file-path',
-          severity: 'high',
-          issue: 'separator',
+          type: "file-path",
+          severity: "high",
+          issue: "separator",
           filePath,
-          location: { line: index + 1, column: line.indexOf('\\') },
-          message: 'Hardcoded backslash path separator detected',
-          suggestion: 'Use path.join() or path.resolve() for cross-platform compatibility',
+          location: { line: index + 1, column: line.indexOf("\\") },
+          message: "Hardcoded backslash path separator detected",
+          suggestion:
+            "Use path.join() or path.resolve() for cross-platform compatibility",
         });
       }
 
       // Look for forward slashes in what might be Windows paths
-      if (line.includes('C:/') || line.includes('D:/')) {
+      if (line.includes("C:/") || line.includes("D:/")) {
         this.issues.push({
-          type: 'file-path',
-          severity: 'medium',
-          issue: 'separator',
+          type: "file-path",
+          severity: "medium",
+          issue: "separator",
           filePath,
-          location: { line: index + 1, column: line.indexOf(':/') },
-          message: 'Hardcoded drive letter detected',
-          suggestion: 'Avoid absolute paths; use relative paths or environment variables',
+          location: { line: index + 1, column: line.indexOf(":/") },
+          message: "Hardcoded drive letter detected",
+          suggestion:
+            "Avoid absolute paths; use relative paths or environment variables",
         });
       }
     });
   }
 
   private checkAbsolutePaths(code: string, filePath: string): void {
-    const lines = code.split('\n');
-    
+    const lines = code.split("\n");
+
     lines.forEach((line, index) => {
       // Unix absolute paths
       if (line.match(/['"`]\/[a-zA-Z\/]+['"`]/)) {
         this.issues.push({
-          type: 'file-path',
-          severity: 'high',
-          issue: 'absolute-path',
+          type: "file-path",
+          severity: "high",
+          issue: "absolute-path",
           filePath,
-          location: { line: index + 1, column: line.indexOf('/') },
-          message: 'Hardcoded absolute path detected',
-          suggestion: 'Use relative paths or environment-specific configuration',
+          location: { line: index + 1, column: line.indexOf("/") },
+          message: "Hardcoded absolute path detected",
+          suggestion:
+            "Use relative paths or environment-specific configuration",
         });
       }
 
       // Windows absolute paths
       if (line.match(/['"`][A-Z]:[\\\/]/)) {
         this.issues.push({
-          type: 'file-path',
-          severity: 'high',
-          issue: 'absolute-path',
+          type: "file-path",
+          severity: "high",
+          issue: "absolute-path",
           filePath,
           location: { line: index + 1, column: line.search(/[A-Z]:/) },
-          message: 'Hardcoded Windows absolute path detected',
-          suggestion: 'Use relative paths or environment-specific configuration',
+          message: "Hardcoded Windows absolute path detected",
+          suggestion:
+            "Use relative paths or environment-specific configuration",
         });
       }
     });
@@ -161,23 +190,28 @@ export class FilePathAnalyzer {
   private checkCaseSensitivity(code: string, filePath: string): void {
     // This would require more sophisticated analysis
     // For now, we'll flag potential issues based on patterns
-    const lines = code.split('\n');
-    
+    const lines = code.split("\n");
+
     lines.forEach((line, index) => {
-      if (line.includes('require(') || line.includes('import ')) {
+      if (line.includes("require(") || line.includes("import ")) {
         const moduleMatch = line.match(/['"`]\.\/([^'"`]+)['"`]/);
         if (moduleMatch) {
           const modulePath = moduleMatch[1];
           // Check if the path uses inconsistent casing
-          if (modulePath !== modulePath.toLowerCase() && modulePath !== modulePath.toUpperCase()) {
+          if (
+            modulePath !== modulePath.toLowerCase() &&
+            modulePath !== modulePath.toUpperCase()
+          ) {
             this.issues.push({
-              type: 'file-path',
-              severity: 'medium',
-              issue: 'case-sensitivity',
+              type: "file-path",
+              severity: "medium",
+              issue: "case-sensitivity",
               filePath,
               location: { line: index + 1, column: 0 },
-              message: 'Mixed-case path detected - may cause issues on case-sensitive filesystems',
-              suggestion: 'Use consistent lowercase naming for cross-platform compatibility',
+              message:
+                "Mixed-case path detected - may cause issues on case-sensitive filesystems",
+              suggestion:
+                "Use consistent lowercase naming for cross-platform compatibility",
             });
           }
         }
@@ -196,22 +230,25 @@ export class FilePathAnalyzer {
     return problematicChars.test(name);
   }
 
-  private checkDuplicateCaseInsensitive(dirPath: string, fileName: string): void {
+  private checkDuplicateCaseInsensitive(
+    dirPath: string,
+    fileName: string,
+  ): void {
     try {
       const entries = fs.readdirSync(dirPath);
-      const lowerCaseFiles = entries.map(e => e.toLowerCase());
-      const duplicates = lowerCaseFiles.filter((name, index) => 
-        lowerCaseFiles.indexOf(name) !== index
+      const lowerCaseFiles = entries.map((e) => e.toLowerCase());
+      const duplicates = lowerCaseFiles.filter(
+        (name, index) => lowerCaseFiles.indexOf(name) !== index,
       );
 
       if (duplicates.includes(fileName.toLowerCase())) {
         this.issues.push({
-          type: 'file-path',
-          severity: 'critical',
-          issue: 'case-sensitivity',
+          type: "file-path",
+          severity: "critical",
+          issue: "case-sensitivity",
           filePath: path.join(dirPath, fileName),
           message: `File/directory name conflicts with another name that differs only in case`,
-          suggestion: 'Ensure all files have unique names regardless of case',
+          suggestion: "Ensure all files have unique names regardless of case",
         });
       }
     } catch (error) {

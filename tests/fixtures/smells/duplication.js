@@ -2,16 +2,16 @@
 
 function validateUserEmail(email) {
   if (!email) {
-    return { valid: false, error: 'Email is required' };
+    return { valid: false, error: "Email is required" };
   }
   if (email.length < 5) {
-    return { valid: false, error: 'Email too short' };
+    return { valid: false, error: "Email too short" };
   }
-  if (!email.includes('@')) {
-    return { valid: false, error: 'Invalid email format' };
+  if (!email.includes("@")) {
+    return { valid: false, error: "Invalid email format" };
   }
-  if (!email.includes('.')) {
-    return { valid: false, error: 'Invalid email format' };
+  if (!email.includes(".")) {
+    return { valid: false, error: "Invalid email format" };
   }
   return { valid: true };
 }
@@ -19,20 +19,20 @@ function validateUserEmail(email) {
 // DUPLICATE: Almost identical to above
 function validateAdminEmail(email) {
   if (!email) {
-    return { valid: false, error: 'Email is required' };
+    return { valid: false, error: "Email is required" };
   }
   if (email.length < 5) {
-    return { valid: false, error: 'Email too short' };
+    return { valid: false, error: "Email too short" };
   }
-  if (!email.includes('@')) {
-    return { valid: false, error: 'Invalid email format' };
+  if (!email.includes("@")) {
+    return { valid: false, error: "Invalid email format" };
   }
-  if (!email.includes('.')) {
-    return { valid: false, error: 'Invalid email format' };
+  if (!email.includes(".")) {
+    return { valid: false, error: "Invalid email format" };
   }
   // Only difference
-  if (!email.endsWith('@admin.com')) {
-    return { valid: false, error: 'Must be admin email' };
+  if (!email.endsWith("@admin.com")) {
+    return { valid: false, error: "Must be admin email" };
   }
   return { valid: true };
 }

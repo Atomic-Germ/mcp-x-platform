@@ -1,11 +1,11 @@
-import traverse from '@babel/traverse';
-import { ASTParser } from './ast-parser';
+import traverse from "@babel/traverse";
+import { ASTParser } from "./ast-parser";
 
 export interface CodeSmell {
   type: string;
   line?: number;
   description: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 /**
@@ -44,8 +44,10 @@ export class SmellAnalyzer {
 
     traverse(ast, {
       ClassDeclaration(path) {
-        const className = path.node.id?.name || 'anonymous';
-        const methods = path.node.body.body.filter((node: any) => node.type === 'ClassMethod');
+        const className = path.node.id?.name || "anonymous";
+        const methods = path.node.body.body.filter(
+          (node: any) => node.type === "ClassMethod",
+        );
 
         classes.push({
           name: className,
@@ -56,10 +58,10 @@ export class SmellAnalyzer {
         // God object: >10 methods
         if (methods.length > 10) {
           smells.push({
-            type: 'GOD_OBJECT',
+            type: "GOD_OBJECT",
             line: path.node.loc?.start.line,
             description: `Class '${className}' has ${methods.length} methods. Consider splitting responsibilities.`,
-            severity: methods.length > 15 ? 'critical' : 'high',
+            severity: methods.length > 15 ? "critical" : "high",
           });
         }
       },
@@ -79,24 +81,24 @@ export class SmellAnalyzer {
 
       if (paramCount > 5) {
         smells.push({
-          type: 'LONG_PARAMETER_LIST',
+          type: "LONG_PARAMETER_LIST",
           line: node.loc?.start.line,
           description: `Function '${name}' has ${paramCount} parameters. Consider using a parameter object.`,
-          severity: paramCount > 10 ? 'high' : 'medium',
+          severity: paramCount > 10 ? "high" : "medium",
         });
       }
     };
 
     traverse(ast, {
       FunctionDeclaration(path) {
-        const name = path.node.id?.name || 'anonymous';
+        const name = path.node.id?.name || "anonymous";
         checkParams(path.node, name);
       },
       FunctionExpression(path) {
-        checkParams(path.node, 'anonymous');
+        checkParams(path.node, "anonymous");
       },
       ArrowFunctionExpression(path) {
-        checkParams(path.node, 'arrow');
+        checkParams(path.node, "arrow");
       },
     });
 
@@ -118,24 +120,24 @@ export class SmellAnalyzer {
 
       if (lines > 50) {
         smells.push({
-          type: 'LONG_METHOD',
+          type: "LONG_METHOD",
           line: start,
           description: `Function '${name}' is ${lines} lines long. Consider breaking it down.`,
-          severity: lines > 100 ? 'high' : 'medium',
+          severity: lines > 100 ? "high" : "medium",
         });
       }
     };
 
     traverse(ast, {
       FunctionDeclaration(path) {
-        const name = path.node.id?.name || 'anonymous';
+        const name = path.node.id?.name || "anonymous";
         checkLength(path, name);
       },
       FunctionExpression(path) {
-        checkLength(path, 'anonymous');
+        checkLength(path, "anonymous");
       },
       ArrowFunctionExpression(path) {
-        checkLength(path, 'arrow');
+        checkLength(path, "arrow");
       },
     });
 
@@ -156,7 +158,7 @@ export class SmellAnalyzer {
 
         // Skip allowed numbers and array indices
         if (allowedNumbers.has(value)) return;
-        if (path.parent.type === 'ArrayExpression') return;
+        if (path.parent.type === "ArrayExpression") return;
 
         // Count occurrences
         foundNumbers.set(value, (foundNumbers.get(value) || 0) + 1);
@@ -164,10 +166,10 @@ export class SmellAnalyzer {
         // Flag if used multiple times or looks suspicious
         if (value > 10 && value !== Math.floor(value / 100) * 100) {
           smells.push({
-            type: 'MAGIC_NUMBER',
+            type: "MAGIC_NUMBER",
             line: path.node.loc?.start.line,
             description: `Magic number ${value} found. Consider using a named constant.`,
-            severity: 'low',
+            severity: "low",
           });
         }
       },
@@ -189,10 +191,11 @@ export class SmellAnalyzer {
         // Check if catch block is empty or only has comments
         if (body.body.length === 0) {
           smells.push({
-            type: 'EMPTY_CATCH',
+            type: "EMPTY_CATCH",
             line: path.node.loc?.start.line,
-            description: 'Empty catch block swallows errors silently. At minimum, log the error.',
-            severity: 'high',
+            description:
+              "Empty catch block swallows errors silently. At minimum, log the error.",
+            severity: "high",
           });
         }
       },
@@ -211,7 +214,9 @@ export class SmellAnalyzer {
     traverse(ast, {
       ClassDeclaration(path) {
         classCount++;
-        const methods = path.node.body.body.filter((node: any) => node.type === 'ClassMethod');
+        const methods = path.node.body.body.filter(
+          (node: any) => node.type === "ClassMethod",
+        );
         if (methods.length > 10) {
           largeClasses++;
         }

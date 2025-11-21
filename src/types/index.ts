@@ -3,10 +3,10 @@
  */
 export interface OptimistConfig {
   maxComplexity?: number;
-  analysisDepth?: 'shallow' | 'medium' | 'deep';
+  analysisDepth?: "shallow" | "medium" | "deep";
   ignorePatterns?: string[];
   fileExtensions?: string[];
-  enabledTools?: string[] | 'all';
+  enabledTools?: string[] | "all";
 }
 
 /**
@@ -31,7 +31,7 @@ export interface Tool {
  * Analysis result structure
  */
 export interface AnalysisResult {
-  status: 'success' | 'error';
+  status: "success" | "error";
   tool: string;
   data: {
     summary: string;
@@ -51,7 +51,7 @@ export interface AnalysisResult {
  */
 export interface Finding {
   type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   location: {
     file: string;
     line?: number;
@@ -66,7 +66,7 @@ export interface Finding {
  */
 export interface Suggestion {
   type: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
   description: string;
   example?: string;
   impact?: string;

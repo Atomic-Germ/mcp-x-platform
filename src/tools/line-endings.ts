@@ -1,11 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { LineEndingAnalyzer } from '../analyzers/line-ending-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import { LineEndingAnalyzer } from "../analyzers/line-ending-analyzer";
 
 export interface AnalyzeLineEndingsInput {
   path: string;
   autoFix?: boolean;
-  preferredEnding?: 'LF' | 'CRLF' | 'auto';
+  preferredEnding?: "LF" | "CRLF" | "auto";
 }
 
 export interface AnalyzeLineEndingsResult {
@@ -21,7 +21,7 @@ export interface AnalyzeLineEndingsResult {
 }
 
 export async function analyzeLineEndings(
-  input: AnalyzeLineEndingsInput
+  input: AnalyzeLineEndingsInput,
 ): Promise<AnalyzeLineEndingsResult> {
   const analyzer = new LineEndingAnalyzer();
   const allIssues: any[] = [];
@@ -45,14 +45,18 @@ export async function analyzeLineEndings(
   const mixedEndingFiles = byEnding.mixed || 0;
 
   const recommendations: string[] = [
-    'Configure .gitattributes to enforce consistent line endings',
-    'Set up editor config (.editorconfig) for team consistency',
+    "Configure .gitattributes to enforce consistent line endings",
+    "Set up editor config (.editorconfig) for team consistency",
     'Use "* text=auto eol=lf" in .gitattributes for cross-platform projects',
   ];
 
   if (mixedEndingFiles > 0) {
-    recommendations.unshift('URGENT: Fix files with mixed line endings immediately');
-    recommendations.push('Run: git add --renormalize . to normalize line endings');
+    recommendations.unshift(
+      "URGENT: Fix files with mixed line endings immediately",
+    );
+    recommendations.push(
+      "Run: git add --renormalize . to normalize line endings",
+    );
   }
 
   return {
@@ -114,15 +118,38 @@ function traverseDirectory(dirPath: string, files: string[]): void {
 function isTextFile(fileName: string): boolean {
   const ext = path.extname(fileName);
   const textExtensions = [
-    '.js', '.ts', '.jsx', '.tsx', '.json', '.md', '.txt',
-    '.sh', '.bat', '.ps1', '.yml', '.yaml', '.xml', '.html',
-    '.css', '.scss', '.less', '.py', '.rb', '.go', '.java',
-    '.c', '.cpp', '.h', '.hpp', '.cs', '.php',
+    ".js",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".json",
+    ".md",
+    ".txt",
+    ".sh",
+    ".bat",
+    ".ps1",
+    ".yml",
+    ".yaml",
+    ".xml",
+    ".html",
+    ".css",
+    ".scss",
+    ".less",
+    ".py",
+    ".rb",
+    ".go",
+    ".java",
+    ".c",
+    ".cpp",
+    ".h",
+    ".hpp",
+    ".cs",
+    ".php",
   ];
   return textExtensions.includes(ext);
 }
 
 function shouldSkipDirectory(dirName: string): boolean {
-  const skipDirs = ['node_modules', 'dist', 'build', 'coverage', '.git'];
+  const skipDirs = ["node_modules", "dist", "build", "coverage", ".git"];
   return skipDirs.includes(dirName);
 }

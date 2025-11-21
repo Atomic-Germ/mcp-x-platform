@@ -16,9 +16,9 @@ function findDuplicates(arr) {
 
 // Inefficient string concatenation in loop
 function buildString(items) {
-  let result = '';
+  let result = "";
   for (let i = 0; i < items.length; i++) {
-    result += items[i] + ',';
+    result += items[i] + ",";
   }
   return result;
 }

@@ -17,7 +17,7 @@ class UserManager {
     const user = { name, email, password, age, address, phone };
     this.users.push(user);
     this.sendWelcomeEmail(email);
-    this.trackAnalytics('user_created');
+    this.trackAnalytics("user_created");
     return user;
   }
 
@@ -58,7 +58,13 @@ class UserManager {
 
   // Order management (should be separate)
   createOrder(userId, productId, quantity, shippingAddress, paymentMethod) {
-    const order = { userId, productId, quantity, shippingAddress, paymentMethod };
+    const order = {
+      userId,
+      productId,
+      quantity,
+      shippingAddress,
+      paymentMethod,
+    };
     this.orders.push(order);
     this.processPayment(paymentMethod, quantity);
     this.sendOrderConfirmation(userId);
@@ -72,11 +78,11 @@ class UserManager {
 
   // Notifications (should be separate)
   sendWelcomeEmail(email) {
-    this.notifications.push({ type: 'welcome', to: email });
+    this.notifications.push({ type: "welcome", to: email });
   }
 
   sendOrderConfirmation(userId) {
-    this.notifications.push({ type: 'order', userId });
+    this.notifications.push({ type: "order", userId });
   }
 
   // Analytics (should be separate)

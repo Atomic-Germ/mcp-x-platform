@@ -5,6 +5,7 @@ Thank you for your interest in contributing to Optimist! This document provides 
 ## 🎯 Project Goals
 
 Optimist aims to provide a comprehensive MCP server for code optimization, featuring:
+
 - Intelligent code analysis across multiple dimensions
 - High-quality, maintainable codebase (complexity < 10 per function)
 - Comprehensive test coverage (90%+ target)
@@ -15,6 +16,7 @@ Optimist aims to provide a comprehensive MCP server for code optimization, featu
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or pnpm
 - Git
@@ -73,6 +75,7 @@ npm test -- --watch
 ### 3. Make Your Changes
 
 Follow our coding standards:
+
 - **TDD**: Write tests first, then implementation
 - **Complexity**: Keep functions under 10 cyclomatic complexity
 - **Performance**: Optimize for large codebases
@@ -112,6 +115,7 @@ git commit -m "perf: optimize hot path analysis performance"
 ```
 
 **Commit Types:**
+
 - `feat`: New analysis features or tools
 - `fix`: Bug fixes
 - `refactor`: Code refactoring
@@ -136,24 +140,24 @@ Place tests in the `tests/` directory following the structure:
 
 ```typescript
 // tests/unit/analyzers/complexity.test.ts
-import { describe, it, expect, beforeEach } from 'jest';
-import { ComplexityAnalyzer } from '../../../src/analyzers/complexity-analyzer';
+import { describe, it, expect, beforeEach } from "jest";
+import { ComplexityAnalyzer } from "../../../src/analyzers/complexity-analyzer";
 
-describe('ComplexityAnalyzer', () => {
+describe("ComplexityAnalyzer", () => {
   let analyzer: ComplexityAnalyzer;
 
   beforeEach(() => {
     analyzer = new ComplexityAnalyzer();
   });
 
-  describe('calculateCyclomaticComplexity', () => {
-    it('should return 1 for simple function', () => {
-      const code = 'function simple() { return true; }';
+  describe("calculateCyclomaticComplexity", () => {
+    it("should return 1 for simple function", () => {
+      const code = "function simple() { return true; }";
       const result = analyzer.analyze(code);
       expect(result.cyclomatic).toBe(1);
     });
 
-    it('should handle conditional statements', () => {
+    it("should handle conditional statements", () => {
       const code = `
         function conditional(x) {
           if (x > 0) return 'positive';
@@ -165,9 +169,9 @@ describe('ComplexityAnalyzer', () => {
     });
   });
 
-  describe('error handling', () => {
-    it('should handle syntax errors gracefully', () => {
-      const invalidCode = 'function broken() { return';
+  describe("error handling", () => {
+    it("should handle syntax errors gracefully", () => {
+      const invalidCode = "function broken() { return";
       expect(() => analyzer.analyze(invalidCode)).not.toThrow();
     });
   });
@@ -177,6 +181,7 @@ describe('ComplexityAnalyzer', () => {
 ### Test Coverage Requirements
 
 Minimum coverage thresholds:
+
 - **Statements**: 95%
 - **Branches**: 90%
 - **Functions**: 95%
@@ -234,9 +239,9 @@ npm run lint:fix
 // ❌ Bad: High complexity
 function analyzeComplexCode(ast: any, options: any) {
   if (ast) {
-    if (ast.type === 'Program') {
+    if (ast.type === "Program") {
       for (const node of ast.body) {
-        if (node.type === 'FunctionDeclaration') {
+        if (node.type === "FunctionDeclaration") {
           if (options.includeNestedFunctions) {
             // ... deep nesting
           }
@@ -247,18 +252,24 @@ function analyzeComplexCode(ast: any, options: any) {
 }
 
 // ✅ Good: Low complexity, single responsibility
-function analyzeComplexCode(ast: Program, options: AnalysisOptions): AnalysisResult {
+function analyzeComplexCode(
+  ast: Program,
+  options: AnalysisOptions,
+): AnalysisResult {
   if (!isValidProgram(ast)) return emptyResult();
-  
+
   const functions = extractFunctions(ast, options);
   return analyzeFunctions(functions, options);
 }
 
 function isValidProgram(ast: Program): boolean {
-  return ast?.type === 'Program' && ast.body?.length > 0;
+  return ast?.type === "Program" && ast.body?.length > 0;
 }
 
-function extractFunctions(ast: Program, options: AnalysisOptions): FunctionNode[] {
+function extractFunctions(
+  ast: Program,
+  options: AnalysisOptions,
+): FunctionNode[] {
   const extractor = new FunctionExtractor(options);
   return extractor.extract(ast);
 }
@@ -296,25 +307,27 @@ mcp-optimist/
 ### Adding a New Analyzer
 
 1. **Write Tests First** (TDD):
+
 ```typescript
 // tests/unit/analyzers/security.test.ts
-describe('SecurityAnalyzer', () => {
-  it('should detect SQL injection vulnerabilities', () => {
+describe("SecurityAnalyzer", () => {
+  it("should detect SQL injection vulnerabilities", () => {
     const code = `const query = "SELECT * FROM users WHERE id = " + userId;`;
     const result = analyzer.analyze(code);
     expect(result.vulnerabilities).toContainEqual(
-      expect.objectContaining({ type: 'sql-injection' })
+      expect.objectContaining({ type: "sql-injection" }),
     );
   });
 });
 ```
 
 2. **Create Analyzer Interface**:
+
 ```typescript
 // src/analyzers/security-analyzer.ts
 export interface SecurityVulnerability {
   type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: "low" | "medium" | "high" | "critical";
   line: number;
   column: number;
   description: string;
@@ -328,9 +341,12 @@ export class SecurityAnalyzer extends BaseAnalyzer {
 ```
 
 3. **Create Tool Interface**:
+
 ```typescript
 // src/tools/security.ts
-export async function analyzeSecurity(args: SecurityAnalysisArgs): Promise<ToolResponse> {
+export async function analyzeSecurity(
+  args: SecurityAnalysisArgs,
+): Promise<ToolResponse> {
   const analyzer = new SecurityAnalyzer();
   const result = analyzer.analyze(args.path);
   return formatResponse(result);
@@ -338,6 +354,7 @@ export async function analyzeSecurity(args: SecurityAnalysisArgs): Promise<ToolR
 ```
 
 4. **Register Tool**:
+
 ```typescript
 // src/server.ts
 async listTools(): Promise<Tool[]> {
@@ -355,17 +372,18 @@ async listTools(): Promise<Tool[]> {
 ### Adding Language Support
 
 1. **Extend AST Parser**:
+
 ```typescript
 // src/analyzers/ast-parser.ts
 export class ASTParser {
   parseFile(filePath: string): AST {
     const extension = path.extname(filePath);
     switch (extension) {
-      case '.ts':
-      case '.tsx':
+      case ".ts":
+      case ".tsx":
         return this.parseTypeScript(filePath);
-      case '.py':
-        return this.parsePython(filePath);  // New language
+      case ".py":
+        return this.parsePython(filePath); // New language
       default:
         throw new Error(`Unsupported file type: ${extension}`);
     }
@@ -378,6 +396,7 @@ export class ASTParser {
 ### Optimization Strategies
 
 **1. AST Parsing Efficiency**
+
 ```typescript
 // ❌ Bad: Re-parsing same files
 for (const file of files) {
@@ -396,6 +415,7 @@ for (const file of files) {
 ```
 
 **2. Parallel Analysis**
+
 ```typescript
 // ❌ Bad: Sequential processing
 const results = [];
@@ -405,20 +425,21 @@ for (const file of files) {
 
 // ✅ Good: Parallel processing
 const results = await Promise.allSettled(
-  files.map(file => analyzeFile(file))
+  files.map((file) => analyzeFile(file)),
 );
 ```
 
 **3. Memory Management**
+
 ```typescript
 // ✅ Good: Clean up large objects
 function analyzeProject(projectPath: string): AnalysisResult {
   const ast = parseProject(projectPath);
   const result = performAnalysis(ast);
-  
+
   // Clean up memory
   ast.clear?.();
-  
+
   return result;
 }
 ```
@@ -427,12 +448,12 @@ function analyzeProject(projectPath: string): AnalysisResult {
 
 ```typescript
 // tests/performance/large-codebase.test.ts
-describe('Performance Tests', () => {
-  it('should analyze large codebase within time limit', async () => {
+describe("Performance Tests", () => {
+  it("should analyze large codebase within time limit", async () => {
     const startTime = Date.now();
-    const result = await analyzeProject('./fixtures/large-project');
+    const result = await analyzeProject("./fixtures/large-project");
     const duration = Date.now() - startTime;
-    
+
     expect(duration).toBeLessThan(30000); // 30 seconds max
     expect(result.filesAnalyzed).toBeGreaterThan(1000);
   });
@@ -467,14 +488,14 @@ node dist/index.js analyze_complexity \
 
 Use comprehensive JSDoc:
 
-```typescript
+````typescript
 /**
  * Analyzes code complexity metrics including cyclomatic and cognitive complexity.
- * 
+ *
  * @param filePath - Path to the file to analyze
  * @param options - Analysis configuration options
  * @returns Complexity analysis results with metrics and suggestions
- * 
+ *
  * @example
  * ```typescript
  * const analyzer = new ComplexityAnalyzer();
@@ -482,24 +503,25 @@ Use comprehensive JSDoc:
  *   maxComplexity: 10,
  *   includeCognitive: true
  * });
- * 
+ *
  * console.log(`Cyclomatic: ${result.cyclomatic}`);
  * console.log(`Cognitive: ${result.cognitive}`);
  * ```
- * 
+ *
  * @throws {Error} When file cannot be parsed or analyzed
  */
 export async function analyzeComplexity(
-  filePath: string, 
-  options: ComplexityOptions
+  filePath: string,
+  options: ComplexityOptions,
 ): Promise<ComplexityResult> {
   // Implementation
 }
-```
+````
 
 ### README Updates
 
 When adding features:
+
 1. Update tool list in README
 2. Add usage examples
 3. Update configuration documentation
@@ -510,6 +532,7 @@ When adding features:
 Releases follow semantic versioning and are automated:
 
 1. **Update version**:
+
 ```bash
 npm version patch  # for bug fixes
 npm version minor  # for new features
@@ -517,12 +540,14 @@ npm version major  # for breaking changes
 ```
 
 2. **Create release**:
+
 ```bash
 git tag -a v0.2.0 -m "Release v0.2.0: Add dead code detection"
 git push origin v0.2.0
 ```
 
 The CI/CD pipeline will:
+
 - Run full test suite
 - Build and verify package
 - Create GitHub release with changelog

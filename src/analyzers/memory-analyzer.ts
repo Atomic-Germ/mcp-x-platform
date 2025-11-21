@@ -1,15 +1,15 @@
-import traverse from '@babel/traverse';
-import { ASTParser } from './ast-parser';
+import traverse from "@babel/traverse";
+import { ASTParser } from "./ast-parser";
 
 export interface AllocationInfo {
-  type: 'array' | 'object' | 'buffer' | 'date' | 'regex';
+  type: "array" | "object" | "buffer" | "date" | "regex";
   line?: number;
   inLoop: boolean;
   size?: string;
 }
 
 export interface LeakPattern {
-  type: 'event_listener' | 'timer' | 'cache' | 'closure' | 'circular';
+  type: "event_listener" | "timer" | "cache" | "closure" | "circular";
   line?: number;
   description: string;
 }
@@ -61,10 +61,10 @@ export class MemoryAnalyzer {
 
       // Detect new Array()
       NewExpression(path) {
-        if (path.node.callee.type === 'Identifier') {
+        if (path.node.callee.type === "Identifier") {
           const name = path.node.callee.name;
 
-          if (name === 'Array' || name === 'Buffer' || name === 'Date') {
+          if (name === "Array" || name === "Buffer" || name === "Date") {
             allocations.push({
               type: name.toLowerCase() as any,
               line: path.node.loc?.start.line,
@@ -78,10 +78,10 @@ export class MemoryAnalyzer {
       ArrayExpression(path) {
         if (inLoop && path.node.elements.length > 100) {
           allocations.push({
-            type: 'array',
+            type: "array",
             line: path.node.loc?.start.line,
             inLoop,
-            size: 'large',
+            size: "large",
           });
         }
       },
@@ -90,7 +90,7 @@ export class MemoryAnalyzer {
       ObjectExpression(path) {
         if (inLoop && path.node.properties.length > 3) {
           allocations.push({
-            type: 'object',
+            type: "object",
             line: path.node.loc?.start.line,
             inLoop,
           });
@@ -101,7 +101,7 @@ export class MemoryAnalyzer {
       RegExpLiteral(path) {
         if (inLoop) {
           allocations.push({
-            type: 'regex',
+            type: "regex",
             line: path.node.loc?.start.line,
             inLoop,
           });
@@ -122,24 +122,25 @@ export class MemoryAnalyzer {
       // Detect addEventListener without removeEventListener
       CallExpression(path) {
         if (
-          path.node.callee.type === 'MemberExpression' &&
-          path.node.callee.property.type === 'Identifier'
+          path.node.callee.type === "MemberExpression" &&
+          path.node.callee.property.type === "Identifier"
         ) {
           const methodName = path.node.callee.property.name;
 
           // Event listeners
-          if (methodName === 'addEventListener') {
+          if (methodName === "addEventListener") {
             leaks.push({
-              type: 'event_listener',
+              type: "event_listener",
               line: path.node.loc?.start.line,
-              description: 'addEventListener called without corresponding removeEventListener',
+              description:
+                "addEventListener called without corresponding removeEventListener",
             });
           }
 
           // Timers
-          if (methodName === 'setInterval' || methodName === 'setTimeout') {
+          if (methodName === "setInterval" || methodName === "setTimeout") {
             leaks.push({
-              type: 'timer',
+              type: "timer",
               line: path.node.loc?.start.line,
               description: `${methodName} called without cleanup`,
             });
@@ -147,14 +148,14 @@ export class MemoryAnalyzer {
         }
 
         // Detect unbounded cache growth (obj[key] = value pattern)
-        if (path.node.callee.type === 'Identifier') {
+        if (path.node.callee.type === "Identifier") {
           const funcName = path.node.callee.name;
 
-          if (funcName.toLowerCase().includes('cache')) {
+          if (funcName.toLowerCase().includes("cache")) {
             leaks.push({
-              type: 'cache',
+              type: "cache",
               line: path.node.loc?.start.line,
-              description: 'Cache operation without size limits',
+              description: "Cache operation without size limits",
             });
           }
         }
@@ -168,9 +169,9 @@ export class MemoryAnalyzer {
           const hasLargeData = checkForLargeDataInScope(parent.node);
           if (hasLargeData) {
             leaks.push({
-              type: 'closure',
+              type: "closure",
               line: path.node.loc?.start.line,
-              description: 'Function closure may capture large data structures',
+              description: "Function closure may capture large data structures",
             });
           }
         }
@@ -182,9 +183,9 @@ export class MemoryAnalyzer {
           const hasLargeData = checkForLargeDataInScope(parent.node);
           if (hasLargeData) {
             leaks.push({
-              type: 'closure',
+              type: "closure",
               line: path.node.loc?.start.line,
-              description: 'Arrow function closure may capture large data',
+              description: "Arrow function closure may capture large data",
             });
           }
         }
@@ -204,12 +205,12 @@ export class MemoryAnalyzer {
       ReturnStatement(path) {
         if (
           path.node.argument &&
-          (path.node.argument.type === 'FunctionExpression' ||
-            path.node.argument.type === 'ArrowFunctionExpression')
+          (path.node.argument.type === "FunctionExpression" ||
+            path.node.argument.type === "ArrowFunctionExpression")
         ) {
           issues.push({
             line: path.node.loc?.start.line,
-            type: 'RETURNS_CLOSURE',
+            type: "RETURNS_CLOSURE",
           });
         }
       },
@@ -226,24 +227,24 @@ export class MemoryAnalyzer {
 
     traverse(ast, {
       SpreadElement(path) {
-        if (path.parent.type === 'ArrayExpression') {
+        if (path.parent.type === "ArrayExpression") {
           copies.push({
             line: path.node.loc?.start.line,
-            pattern: 'array_spread',
+            pattern: "array_spread",
           });
         }
       },
 
       CallExpression(path) {
         if (
-          path.node.callee.type === 'MemberExpression' &&
-          path.node.callee.property.type === 'Identifier' &&
-          path.node.callee.property.name === 'slice' &&
+          path.node.callee.type === "MemberExpression" &&
+          path.node.callee.property.type === "Identifier" &&
+          path.node.callee.property.name === "slice" &&
           path.node.arguments.length === 0
         ) {
           copies.push({
             line: path.node.loc?.start.line,
-            pattern: 'slice_copy',
+            pattern: "slice_copy",
           });
         }
       },
@@ -261,18 +262,18 @@ function checkForLargeDataInScope(node: any): boolean {
   if (!node.body || !node.body.body) return false;
 
   for (const statement of node.body.body) {
-    if (statement.type === 'VariableDeclaration') {
+    if (statement.type === "VariableDeclaration") {
       for (const decl of statement.declarations) {
         if (
           decl.init &&
-          decl.init.type === 'NewExpression' &&
-          decl.init.callee.type === 'Identifier' &&
-          decl.init.callee.name === 'Array' &&
+          decl.init.type === "NewExpression" &&
+          decl.init.callee.type === "Identifier" &&
+          decl.init.callee.name === "Array" &&
           decl.init.arguments.length > 0
         ) {
           // Check if array size is large (> 1000)
           const sizeArg = decl.init.arguments[0];
-          if (sizeArg.type === 'NumericLiteral' && sizeArg.value > 1000) {
+          if (sizeArg.type === "NumericLiteral" && sizeArg.value > 1000) {
             return true;
           }
         }

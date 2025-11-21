@@ -1,7 +1,7 @@
-import * as fs from 'fs';
-import * as parser from '@babel/parser';
-import traverse from '@babel/traverse';
-import { Node } from '@babel/types';
+import * as fs from "fs";
+import * as parser from "@babel/parser";
+import traverse from "@babel/traverse";
+import { Node } from "@babel/types";
 
 export interface ParseResult {
   ast: any;
@@ -10,7 +10,7 @@ export interface ParseResult {
 }
 
 export interface LoopInfo {
-  type: 'for' | 'while' | 'do-while' | 'for-in' | 'for-of';
+  type: "for" | "while" | "do-while" | "for-in" | "for-of";
   depth: number;
   line?: number;
   column?: number;
@@ -32,17 +32,17 @@ export class ASTParser {
    * Parse source code file to AST
    */
   parseFile(filePath: string): ParseResult {
-    const code = fs.readFileSync(filePath, 'utf-8');
+    const code = fs.readFileSync(filePath, "utf-8");
     return this.parseCode(code, filePath);
   }
 
   /**
    * Parse source code string to AST
    */
-  parseCode(code: string, filePath = 'unknown'): ParseResult {
+  parseCode(code: string, filePath = "unknown"): ParseResult {
     const ast = parser.parse(code, {
-      sourceType: 'module',
-      plugins: ['jsx', 'typescript'],
+      sourceType: "module",
+      plugins: ["jsx", "typescript"],
     });
 
     return {
@@ -84,7 +84,9 @@ export class ASTParser {
     loops.forEach((loop, index) => {
       if (loop.depth > 1) {
         // Count deeper nested loops
-        const nestedCount = loops.filter((l, i) => i > index && l.depth > loop.depth).length;
+        const nestedCount = loops.filter(
+          (l, i) => i > index && l.depth > loop.depth,
+        ).length;
         loop.nestedLoops = nestedCount;
       }
     });
@@ -101,7 +103,7 @@ export class ASTParser {
     traverse(ast, {
       FunctionDeclaration(path) {
         functions.push({
-          name: path.node.id?.name || 'anonymous',
+          name: path.node.id?.name || "anonymous",
           line: path.node.loc?.start.line,
           params: path.node.params.length,
           complexity: 1,
@@ -109,7 +111,7 @@ export class ASTParser {
       },
       FunctionExpression(path) {
         functions.push({
-          name: 'anonymous',
+          name: "anonymous",
           line: path.node.loc?.start.line,
           params: path.node.params.length,
           complexity: 1,
@@ -117,7 +119,7 @@ export class ASTParser {
       },
       ArrowFunctionExpression(path) {
         functions.push({
-          name: 'arrow',
+          name: "arrow",
           line: path.node.loc?.start.line,
           params: path.node.params.length,
           complexity: 1,
@@ -131,7 +133,9 @@ export class ASTParser {
   /**
    * Detect string concatenation in loops
    */
-  findStringConcatenationInLoops(ast: any): Array<{ line?: number; variable: string }> {
+  findStringConcatenationInLoops(
+    ast: any,
+  ): Array<{ line?: number; variable: string }> {
     const issues: Array<{ line?: number; variable: string }> = [];
     let inLoop = false;
     let loopDepth = 0;
@@ -154,13 +158,17 @@ export class ASTParser {
 
         const { operator, left, right } = path.node;
 
-        if (operator === '+=' && right.type === 'BinaryExpression' && right.operator === '+') {
-          const varName = left.type === 'Identifier' ? left.name : 'unknown';
+        if (
+          operator === "+=" &&
+          right.type === "BinaryExpression" &&
+          right.operator === "+"
+        ) {
+          const varName = left.type === "Identifier" ? left.name : "unknown";
           issues.push({
             line: path.node.loc?.start.line,
             variable: varName,
           });
-        } else if (operator === '+=' && left.type === 'Identifier') {
+        } else if (operator === "+=" && left.type === "Identifier") {
           issues.push({
             line: path.node.loc?.start.line,
             variable: left.name,
@@ -173,19 +181,19 @@ export class ASTParser {
   }
 }
 
-function getLoopType(node: Node): LoopInfo['type'] {
+function getLoopType(node: Node): LoopInfo["type"] {
   switch (node.type) {
-    case 'ForStatement':
-      return 'for';
-    case 'WhileStatement':
-      return 'while';
-    case 'DoWhileStatement':
-      return 'do-while';
-    case 'ForInStatement':
-      return 'for-in';
-    case 'ForOfStatement':
-      return 'for-of';
+    case "ForStatement":
+      return "for";
+    case "WhileStatement":
+      return "while";
+    case "DoWhileStatement":
+      return "do-while";
+    case "ForInStatement":
+      return "for-in";
+    case "ForOfStatement":
+      return "for-of";
     default:
-      return 'for';
+      return "for";
   }
 }

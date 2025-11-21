@@ -1,5 +1,5 @@
-import { AnalysisResult, Finding, Suggestion } from '../types';
-import { ASTParser } from '../analyzers/ast-parser';
+import { AnalysisResult, Finding, Suggestion } from "../types";
+import { ASTParser } from "../analyzers/ast-parser";
 
 /**
  * Performance Analyzer - Identifies performance bottlenecks and inefficiencies
@@ -39,8 +39,8 @@ export class PerformanceAnalyzer {
       loops.forEach((loop) => {
         if (loop.depth >= 3) {
           findings.push({
-            type: 'NESTED_LOOPS',
-            severity: 'critical',
+            type: "NESTED_LOOPS",
+            severity: "critical",
             location: {
               file: filePath,
               line: loop.line,
@@ -51,17 +51,17 @@ export class PerformanceAnalyzer {
           });
 
           suggestions.push({
-            type: 'OPTIMIZE_ALGORITHM',
-            priority: 'high',
+            type: "OPTIMIZE_ALGORITHM",
+            priority: "high",
             description: `Reduce loop nesting from depth ${loop.depth}. Consider using more efficient algorithms or data structures.`,
             example:
-              'Use hash maps for lookups instead of nested loops, or consider streaming/chunking for large datasets.',
+              "Use hash maps for lookups instead of nested loops, or consider streaming/chunking for large datasets.",
             impact: `Potential performance improvement: O(n^${loop.depth}) → O(n) or O(n log n)`,
           });
         } else if (loop.depth === 2) {
           findings.push({
-            type: 'NESTED_LOOPS',
-            severity: 'high',
+            type: "NESTED_LOOPS",
+            severity: "high",
             location: {
               file: filePath,
               line: loop.line,
@@ -72,11 +72,12 @@ export class PerformanceAnalyzer {
           });
 
           suggestions.push({
-            type: 'OPTIMIZE_ALGORITHM',
-            priority: 'medium',
+            type: "OPTIMIZE_ALGORITHM",
+            priority: "medium",
             description: `Consider optimizing nested loop at depth ${loop.depth}.`,
-            example: 'Use Set or Map for O(1) lookups, or consider sorting and binary search.',
-            impact: 'Potential improvement from O(n^2) to O(n) or O(n log n)',
+            example:
+              "Use Set or Map for O(1) lookups, or consider sorting and binary search.",
+            impact: "Potential improvement from O(n^2) to O(n) or O(n log n)",
           });
         }
       });
@@ -86,11 +87,12 @@ export class PerformanceAnalyzer {
       metrics.totalFunctions = functions.length;
 
       // Detect string concatenation in loops
-      const stringConcatIssues = this.parser.findStringConcatenationInLoops(ast);
+      const stringConcatIssues =
+        this.parser.findStringConcatenationInLoops(ast);
       stringConcatIssues.forEach((issue) => {
         findings.push({
-          type: 'INEFFICIENT_STRING_CONCAT',
-          severity: 'medium',
+          type: "INEFFICIENT_STRING_CONCAT",
+          severity: "medium",
           location: {
             file: filePath,
             line: issue.line,
@@ -100,30 +102,33 @@ export class PerformanceAnalyzer {
         });
 
         suggestions.push({
-          type: 'USE_ARRAY_JOIN',
-          priority: 'medium',
-          description: 'Use array join instead of string concatenation in loops',
-          example: 'Instead of: str += item\nUse: items.push(item); str = items.join("")',
+          type: "USE_ARRAY_JOIN",
+          priority: "medium",
+          description:
+            "Use array join instead of string concatenation in loops",
+          example:
+            'Instead of: str += item\nUse: items.push(item); str = items.join("")',
           impact:
-            'Reduces memory allocations and improves performance significantly for large strings',
+            "Reduces memory allocations and improves performance significantly for large strings",
         });
       });
 
       // Add general suggestion if no specific issues found
       if (findings.length === 0) {
         suggestions.push({
-          type: 'GENERAL',
-          priority: 'low',
-          description: 'No significant performance issues detected. Code appears well-optimized.',
-          impact: 'Continue monitoring performance as codebase grows.',
+          type: "GENERAL",
+          priority: "low",
+          description:
+            "No significant performance issues detected. Code appears well-optimized.",
+          impact: "Continue monitoring performance as codebase grows.",
         });
       }
 
       const duration = Date.now() - startTime;
 
       return {
-        status: 'success',
-        tool: 'analyze_performance',
+        status: "success",
+        tool: "analyze_performance",
         data: {
           summary: this.generateSummary(findings, metrics),
           findings,
@@ -138,11 +143,12 @@ export class PerformanceAnalyzer {
       };
     } catch (error) {
       const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       return {
-        status: 'error',
-        tool: 'analyze_performance',
+        status: "error",
+        tool: "analyze_performance",
         data: {
           summary: `Error analyzing file: ${errorMessage}`,
           findings: [],
@@ -158,21 +164,24 @@ export class PerformanceAnalyzer {
     }
   }
 
-  private generateSummary(findings: Finding[], metrics: Record<string, any>): string {
+  private generateSummary(
+    findings: Finding[],
+    metrics: Record<string, any>,
+  ): string {
     if (findings.length === 0) {
       return `Performance analysis complete. Analyzed ${metrics.totalFunctions} functions and ${metrics.totalLoops} loops. No critical issues found.`;
     }
 
-    const critical = findings.filter((f) => f.severity === 'critical').length;
-    const high = findings.filter((f) => f.severity === 'high').length;
-    const medium = findings.filter((f) => f.severity === 'medium').length;
+    const critical = findings.filter((f) => f.severity === "critical").length;
+    const high = findings.filter((f) => f.severity === "high").length;
+    const medium = findings.filter((f) => f.severity === "medium").length;
 
     let summary = `Found ${findings.length} performance issue(s): `;
     const parts = [];
     if (critical > 0) parts.push(`${critical} critical`);
     if (high > 0) parts.push(`${high} high`);
     if (medium > 0) parts.push(`${medium} medium`);
-    summary += parts.join(', ');
+    summary += parts.join(", ");
 
     if (metrics.maxLoopDepth >= 3) {
       summary += `. Maximum loop depth: ${metrics.maxLoopDepth} (consider refactoring)`;

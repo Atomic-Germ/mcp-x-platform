@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
-import { XPlatformServer } from './server.js';
-import { detectPlatformAPIs } from './tools/platform-apis.js';
-import { analyzeFilePaths } from './tools/file-paths.js';
-import { analyzeLineEndings } from './tools/line-endings.js';
-import { analyzeShellCommands } from './tools/shell-commands.js';
-import { generateCompatibilityReport } from './tools/compatibility-report.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { XPlatformServer } from "./server.js";
+import { detectPlatformAPIs } from "./tools/platform-apis.js";
+import { analyzeFilePaths } from "./tools/file-paths.js";
+import { analyzeLineEndings } from "./tools/line-endings.js";
+import { analyzeShellCommands } from "./tools/shell-commands.js";
+import { generateCompatibilityReport } from "./tools/compatibility-report.js";
 
 /**
  * Main entry point for the X-Platform MCP server
@@ -25,7 +28,7 @@ async function main() {
       capabilities: {
         tools: {},
       },
-    }
+    },
   );
 
   // Handle list_tools request
@@ -40,73 +43,73 @@ async function main() {
 
     try {
       switch (name) {
-        case 'detect_platform_apis': {
+        case "detect_platform_apis": {
           const result = await detectPlatformAPIs(args as any);
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: JSON.stringify(result, null, 2),
               },
             ],
           };
         }
 
-        case 'analyze_file_paths': {
+        case "analyze_file_paths": {
           const result = await analyzeFilePaths(args as any);
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: JSON.stringify(result, null, 2),
               },
             ],
           };
         }
 
-        case 'analyze_line_endings': {
+        case "analyze_line_endings": {
           const result = await analyzeLineEndings(args as any);
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: JSON.stringify(result, null, 2),
               },
             ],
           };
         }
 
-        case 'analyze_shell_commands': {
+        case "analyze_shell_commands": {
           const result = await analyzeShellCommands(args as any);
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: JSON.stringify(result, null, 2),
               },
             ],
           };
         }
 
-        case 'generate_compatibility_report': {
+        case "generate_compatibility_report": {
           const result = await generateCompatibilityReport(args as any);
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: JSON.stringify(result, null, 2),
               },
             ],
           };
         }
 
-        case 'analyze_dependencies':
-        case 'analyze_build_systems':
-        case 'detect_encoding_issues': {
+        case "analyze_dependencies":
+        case "analyze_build_systems":
+        case "detect_encoding_issues": {
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: `Tool '${name}' implementation pending. Arguments received: ${JSON.stringify(args, null, 2)}`,
               },
             ],
@@ -117,7 +120,7 @@ async function main() {
           return {
             content: [
               {
-                type: 'text',
+                type: "text",
                 text: `Unknown tool: '${name}'`,
               },
             ],
@@ -125,11 +128,12 @@ async function main() {
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return {
         content: [
           {
-            type: 'text',
+            type: "text",
             text: `Error executing tool '${name}': ${errorMessage}`,
           },
         ],
@@ -142,10 +146,10 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('X-Platform MCP server running on stdio');
+  console.error("X-Platform MCP server running on stdio");
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });

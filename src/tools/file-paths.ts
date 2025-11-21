@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { FilePathAnalyzer } from '../analyzers/file-path-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import { FilePathAnalyzer } from "../analyzers/file-path-analyzer";
 
 export interface AnalyzeFilePathsInput {
   path: string;
@@ -22,20 +22,20 @@ export interface AnalyzeFilePathsResult {
 }
 
 export async function analyzeFilePaths(
-  input: AnalyzeFilePathsInput
+  input: AnalyzeFilePathsInput,
 ): Promise<AnalyzeFilePathsResult> {
   const analyzer = new FilePathAnalyzer();
-  
+
   // Analyze both code and filesystem
   const codeIssues: any[] = [];
   const filesystemIssues = analyzer.analyzeFilesystem(input.path);
 
   // Also analyze code for hardcoded paths
   const filesToAnalyze = collectFiles(input.path);
-  
+
   for (const filePath of filesToAnalyze) {
     try {
-      const code = fs.readFileSync(filePath, 'utf-8');
+      const code = fs.readFileSync(filePath, "utf-8");
       const issues = analyzer.analyzeCode(code, filePath);
       codeIssues.push(...issues);
     } catch (error) {
@@ -61,18 +61,22 @@ export async function analyzeFilePaths(
 
   // Generate recommendations
   const recommendations: string[] = [
-    'Always use path.join() or path.resolve() instead of string concatenation',
-    'Use path.sep for cross-platform path separators',
-    'Avoid absolute paths - use relative paths or environment variables',
-    'Normalize paths with path.normalize() when handling user input',
+    "Always use path.join() or path.resolve() instead of string concatenation",
+    "Use path.sep for cross-platform path separators",
+    "Avoid absolute paths - use relative paths or environment variables",
+    "Normalize paths with path.normalize() when handling user input",
   ];
 
-  if (byIssueType['reserved-name']) {
-    recommendations.push('CRITICAL: Rename files that use Windows reserved names');
+  if (byIssueType["reserved-name"]) {
+    recommendations.push(
+      "CRITICAL: Rename files that use Windows reserved names",
+    );
   }
 
-  if (byIssueType['case-sensitivity']) {
-    recommendations.push('Ensure consistent file naming to avoid case-sensitivity issues');
+  if (byIssueType["case-sensitivity"]) {
+    recommendations.push(
+      "Ensure consistent file naming to avoid case-sensitivity issues",
+    );
   }
 
   return {
@@ -131,10 +135,19 @@ function traverseDirectory(dirPath: string, files: string[]): void {
 
 function isAnalyzableFile(fileName: string): boolean {
   const ext = path.extname(fileName);
-  return ['.js', '.ts', '.jsx', '.tsx', '.json', '.sh', '.bat', '.ps1'].includes(ext);
+  return [
+    ".js",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".json",
+    ".sh",
+    ".bat",
+    ".ps1",
+  ].includes(ext);
 }
 
 function shouldSkipDirectory(dirName: string): boolean {
-  const skipDirs = ['node_modules', 'dist', 'build', 'coverage', '.git'];
+  const skipDirs = ["node_modules", "dist", "build", "coverage", ".git"];
   return skipDirs.includes(dirName);
 }

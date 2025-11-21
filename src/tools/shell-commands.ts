@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { ShellCommandAnalyzer } from '../analyzers/shell-command-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import { ShellCommandAnalyzer } from "../analyzers/shell-command-analyzer";
 
 export interface AnalyzeShellCommandsInput {
   path: string;
@@ -21,7 +21,7 @@ export interface AnalyzeShellCommandsResult {
 }
 
 export async function analyzeShellCommands(
-  input: AnalyzeShellCommandsInput
+  input: AnalyzeShellCommandsInput,
 ): Promise<AnalyzeShellCommandsResult> {
   const analyzer = new ShellCommandAnalyzer();
   const allIssues: any[] = [];
@@ -30,12 +30,12 @@ export async function analyzeShellCommands(
 
   for (const filePath of filesToAnalyze) {
     try {
-      const code = fs.readFileSync(filePath, 'utf-8');
+      const code = fs.readFileSync(filePath, "utf-8");
       const ext = path.extname(filePath);
 
       let issues: any[] = [];
-      
-      if (['.sh', '.bash'].includes(ext)) {
+
+      if ([".sh", ".bash"].includes(ext)) {
         issues = analyzer.analyzeShellScript(code, filePath);
       } else {
         issues = analyzer.analyzeCode(code, filePath);
@@ -64,24 +64,30 @@ export async function analyzeShellCommands(
   // Generate recommendations
   const recommendations: string[] = [];
 
-  if (byIssueType['platform-specific']) {
-    recommendations.push('Use cross-platform alternatives:');
+  if (byIssueType["platform-specific"]) {
+    recommendations.push("Use cross-platform alternatives:");
     recommendations.push('  - Use "rimraf" instead of rm/del');
     recommendations.push('  - Use "cross-spawn" for spawning processes');
     recommendations.push('  - Use "cross-env" for environment variables');
     recommendations.push('  - Use "shelljs" for portable shell commands');
   }
 
-  if (byIssueType['incompatible-shell']) {
-    recommendations.push('Provide both .sh and .bat/.ps1 scripts for cross-platform support');
-    recommendations.push('Or use Node.js scripts instead of shell scripts');
+  if (byIssueType["incompatible-shell"]) {
+    recommendations.push(
+      "Provide both .sh and .bat/.ps1 scripts for cross-platform support",
+    );
+    recommendations.push("Or use Node.js scripts instead of shell scripts");
   }
 
-  if (byIssueType['env-var']) {
-    recommendations.push('Always check environment variables before use: process.env.VAR || defaultValue');
+  if (byIssueType["env-var"]) {
+    recommendations.push(
+      "Always check environment variables before use: process.env.VAR || defaultValue",
+    );
   }
 
-  recommendations.push('Consider using package.json scripts with cross-platform tools');
+  recommendations.push(
+    "Consider using package.json scripts with cross-platform tools",
+  );
 
   return {
     success: true,
@@ -140,12 +146,21 @@ function traverseDirectory(dirPath: string, files: string[]): void {
 function isRelevantFile(fileName: string): boolean {
   const ext = path.extname(fileName);
   return (
-    ['.js', '.ts', '.jsx', '.tsx', '.sh', '.bash', '.bat', '.ps1', '.cmd'].includes(ext) ||
-    fileName === 'package.json'
+    [
+      ".js",
+      ".ts",
+      ".jsx",
+      ".tsx",
+      ".sh",
+      ".bash",
+      ".bat",
+      ".ps1",
+      ".cmd",
+    ].includes(ext) || fileName === "package.json"
   );
 }
 
 function shouldSkipDirectory(dirName: string): boolean {
-  const skipDirs = ['node_modules', 'dist', 'build', 'coverage', '.git'];
+  const skipDirs = ["node_modules", "dist", "build", "coverage", ".git"];
   return skipDirs.includes(dirName);
 }

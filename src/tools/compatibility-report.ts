@@ -1,8 +1,8 @@
 export interface GenerateCompatibilityReportInput {
   path: string;
   targetPlatforms?: string[];
-  format?: 'summary' | 'detailed' | 'json' | 'markdown';
-  severity?: 'low' | 'medium' | 'high' | 'critical';
+  format?: "summary" | "detailed" | "json" | "markdown";
+  severity?: "low" | "medium" | "high" | "critical";
 }
 
 export interface GenerateCompatibilityReportResult {
@@ -14,10 +14,14 @@ export interface GenerateCompatibilityReportResult {
 }
 
 export async function generateCompatibilityReport(
-  input: GenerateCompatibilityReportInput
+  input: GenerateCompatibilityReportInput,
 ): Promise<GenerateCompatibilityReportResult> {
-  const targetPlatforms = input.targetPlatforms || ['windows', 'macos', 'linux'];
-  const format = input.format || 'summary';
+  const targetPlatforms = input.targetPlatforms || [
+    "windows",
+    "macos",
+    "linux",
+  ];
+  const format = input.format || "summary";
 
   // This would aggregate results from all other analyzers
   // For now, we'll create a comprehensive report structure
@@ -33,10 +37,14 @@ export async function generateCompatibilityReport(
   };
 }
 
-function generateReport(projectPath: string, platforms: string[], format: string): string {
+function generateReport(
+  projectPath: string,
+  platforms: string[],
+  format: string,
+): string {
   const timestamp = new Date().toISOString();
 
-  if (format === 'json') {
+  if (format === "json") {
     return JSON.stringify(
       {
         timestamp,
@@ -51,11 +59,11 @@ function generateReport(projectPath: string, platforms: string[], format: string
         },
       },
       null,
-      2
+      2,
     );
   }
 
-  if (format === 'markdown') {
+  if (format === "markdown") {
     return generateMarkdownReport(projectPath, platforms, timestamp);
   }
 
@@ -63,12 +71,16 @@ function generateReport(projectPath: string, platforms: string[], format: string
   return generateSummaryReport(projectPath, platforms, timestamp);
 }
 
-function generateMarkdownReport(projectPath: string, platforms: string[], timestamp: string): string {
+function generateMarkdownReport(
+  projectPath: string,
+  platforms: string[],
+  timestamp: string,
+): string {
   return `# Cross-Platform Compatibility Report
 
 **Project:** ${projectPath}
 **Date:** ${timestamp}
-**Target Platforms:** ${platforms.join(', ')}
+**Target Platforms:** ${platforms.join(", ")}
 
 ## Executive Summary
 
@@ -133,13 +145,17 @@ Review of package dependencies for platform-specific packages.
 `;
 }
 
-function generateSummaryReport(projectPath: string, platforms: string[], timestamp: string): string {
+function generateSummaryReport(
+  projectPath: string,
+  platforms: string[],
+  timestamp: string,
+): string {
   return `Cross-Platform Compatibility Report
 =====================================
 
 Project: ${projectPath}
 Date: ${timestamp}
-Platforms: ${platforms.join(', ')}
+Platforms: ${platforms.join(", ")}
 
 Summary:
 - Platform API Issues: 0

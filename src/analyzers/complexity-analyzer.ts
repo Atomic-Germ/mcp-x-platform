@@ -1,5 +1,5 @@
-import traverse from '@babel/traverse';
-import { ASTParser } from './ast-parser';
+import traverse from "@babel/traverse";
+import { ASTParser } from "./ast-parser";
 
 export interface FunctionComplexity {
   name: string;
@@ -30,10 +30,17 @@ export class ComplexityAnalyzer {
     return {
       functions,
       totalFunctions: functions.length,
-      averageComplexity: this.calculateAverage(functions.map((f) => f.cyclomatic)),
+      averageComplexity: this.calculateAverage(
+        functions.map((f) => f.cyclomatic),
+      ),
       maxComplexity: Math.max(...functions.map((f) => f.cyclomatic), 0),
-      averageCognitive: this.calculateAverage(functions.map((f) => f.cognitive)),
-      totalDecisionPoints: functions.reduce((sum, f) => sum + f.decisionPoints, 0),
+      averageCognitive: this.calculateAverage(
+        functions.map((f) => f.cognitive),
+      ),
+      totalDecisionPoints: functions.reduce(
+        (sum, f) => sum + f.decisionPoints,
+        0,
+      ),
       mostComplexFunction: this.findMostComplex(functions),
     };
   }
@@ -48,7 +55,7 @@ export class ComplexityAnalyzer {
       FunctionDeclaration: (path) => {
         const complexity = this.calculateFunctionComplexity(path);
         functions.push({
-          name: path.node.id?.name || 'anonymous',
+          name: path.node.id?.name || "anonymous",
           line: path.node.loc?.start.line,
           ...complexity,
         });
@@ -56,7 +63,7 @@ export class ComplexityAnalyzer {
       FunctionExpression: (path) => {
         const complexity = this.calculateFunctionComplexity(path);
         functions.push({
-          name: 'anonymous',
+          name: "anonymous",
           line: path.node.loc?.start.line,
           ...complexity,
         });
@@ -64,7 +71,7 @@ export class ComplexityAnalyzer {
       ArrowFunctionExpression: (path) => {
         const complexity = this.calculateFunctionComplexity(path);
         functions.push({
-          name: 'arrow',
+          name: "arrow",
           line: path.node.loc?.start.line,
           ...complexity,
         });
@@ -158,7 +165,7 @@ export class ComplexityAnalyzer {
       },
 
       LogicalExpression: (subPath: any) => {
-        if (subPath.node.operator === '&&' || subPath.node.operator === '||') {
+        if (subPath.node.operator === "&&" || subPath.node.operator === "||") {
           cyclomatic++;
           decisionPoints++;
         }
@@ -221,7 +228,9 @@ export class ComplexityAnalyzer {
   private findMostComplex(functions: FunctionComplexity[]): string | undefined {
     if (functions.length === 0) return undefined;
 
-    const most = functions.reduce((max, f) => (f.cyclomatic > max.cyclomatic ? f : max));
+    const most = functions.reduce((max, f) =>
+      f.cyclomatic > max.cyclomatic ? f : max,
+    );
 
     return `${most.name} (complexity: ${most.cyclomatic})`;
   }

@@ -35,7 +35,7 @@ function buildStringEfficient(items) {
     parts.push(items[i].toString());
   }
 
-  return parts.join('\n');
+  return parts.join("\n");
 }
 
 // Pattern 3: Object pooling

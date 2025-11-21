@@ -1,9 +1,9 @@
-import * as fs from 'fs';
+import * as fs from "fs";
 
 interface RefactoringOpportunity {
   type: string;
   description: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
   location: {
     file: string;
     line?: number;
@@ -24,7 +24,11 @@ export class RefactoringAnalyzer {
    */
   analyzeRefactoring(
     filePath: string,
-    focusArea: 'performance' | 'maintainability' | 'readability' | 'all' = 'all'
+    focusArea:
+      | "performance"
+      | "maintainability"
+      | "readability"
+      | "all" = "all",
   ): {
     opportunities: RefactoringOpportunity[];
     totalOpportunities: number;
@@ -33,26 +37,29 @@ export class RefactoringAnalyzer {
   } {
     const opportunities: RefactoringOpportunity[] = [];
     // Default to 'all' for invalid focus areas
-    const validFocusArea = ['performance', 'maintainability', 'readability', 'all'].includes(
-      focusArea
-    )
+    const validFocusArea = [
+      "performance",
+      "maintainability",
+      "readability",
+      "all",
+    ].includes(focusArea)
       ? focusArea
-      : 'all';
+      : "all";
 
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
+      const content = fs.readFileSync(filePath, "utf-8");
+      const lines = content.split("\n");
 
       // Analyze for different refactoring opportunities based on focus area
-      if (validFocusArea === 'all' || validFocusArea === 'performance') {
+      if (validFocusArea === "all" || validFocusArea === "performance") {
         this.findPerformanceOpportunities(lines, filePath, opportunities);
       }
 
-      if (validFocusArea === 'all' || validFocusArea === 'maintainability') {
+      if (validFocusArea === "all" || validFocusArea === "maintainability") {
         this.findMaintainabilityOpportunities(lines, filePath, opportunities);
       }
 
-      if (validFocusArea === 'all' || validFocusArea === 'readability') {
+      if (validFocusArea === "all" || validFocusArea === "readability") {
         this.findReadabilityOpportunities(lines, filePath, opportunities);
       }
     } catch (error) {
@@ -70,53 +77,57 @@ export class RefactoringAnalyzer {
   private findPerformanceOpportunities(
     lines: string[],
     filePath: string,
-    opportunities: RefactoringOpportunity[]
+    opportunities: RefactoringOpportunity[],
   ): void {
     lines.forEach((line, index) => {
       // Check for inefficient loops
-      if (/for\s*\(\s*let\s+\w+\s*=\s*0;/.test(line) && /\.length/g.test(line)) {
+      if (
+        /for\s*\(\s*let\s+\w+\s*=\s*0;/.test(line) &&
+        /\.length/g.test(line)
+      ) {
         opportunities.push({
-          type: 'INEFFICIENT_LOOP',
-          description: 'Loop condition accesses array.length on each iteration',
-          priority: 'medium',
+          type: "INEFFICIENT_LOOP",
+          description: "Loop condition accesses array.length on each iteration",
+          priority: "medium",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Cache array length before loop: const len = arr.length;',
-          impact: 'Reduces property access overhead in tight loops',
+          suggestion: "Cache array length before loop: const len = arr.length;",
+          impact: "Reduces property access overhead in tight loops",
           example:
-            '// Bad\nfor (let i = 0; i < arr.length; i++) { }\n\n// Good\nconst len = arr.length;\nfor (let i = 0; i < len; i++) { }',
+            "// Bad\nfor (let i = 0; i < arr.length; i++) { }\n\n// Good\nconst len = arr.length;\nfor (let i = 0; i < len; i++) { }",
         });
       }
 
       // Check for repeated calculations in conditions
       if (/if\s*\([^)]*\s*\+\s*[^)]*\s*[<>=]/.test(line)) {
         opportunities.push({
-          type: 'REPEATED_CALCULATION',
-          description: 'Arithmetic expression evaluated in condition',
-          priority: 'low',
+          type: "REPEATED_CALCULATION",
+          description: "Arithmetic expression evaluated in condition",
+          priority: "low",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Pre-calculate values before the condition',
-          impact: 'Improves code clarity and may improve performance',
+          suggestion: "Pre-calculate values before the condition",
+          impact: "Improves code clarity and may improve performance",
         });
       }
 
       // Check for nested loops that could be optimized
       if (/for\s*\(.*for\s*\(/.test(line)) {
         opportunities.push({
-          type: 'NESTED_LOOPS',
-          description: 'Nested loop detected - potential O(n²) complexity',
-          priority: 'high',
+          type: "NESTED_LOOPS",
+          description: "Nested loop detected - potential O(n²) complexity",
+          priority: "high",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Consider using a Set or Map for O(n log n) or O(n) complexity',
-          impact: 'Significant performance improvement for large datasets',
+          suggestion:
+            "Consider using a Set or Map for O(n log n) or O(n) complexity",
+          impact: "Significant performance improvement for large datasets",
         });
       }
     });
@@ -125,14 +136,16 @@ export class RefactoringAnalyzer {
   private findMaintainabilityOpportunities(
     lines: string[],
     filePath: string,
-    opportunities: RefactoringOpportunity[]
+    opportunities: RefactoringOpportunity[],
   ): void {
     // Check for long functions (rough heuristic)
     let functionStart = -1;
     let braceCount = 0;
 
     lines.forEach((line, index) => {
-      if (/function\s+\w+\s*\(|^\s*(async\s+)?function\s*\(|=>\s*\{/.test(line)) {
+      if (
+        /function\s+\w+\s*\(|^\s*(async\s+)?function\s*\(|=>\s*\{/.test(line)
+      ) {
         functionStart = index;
         braceCount = 0;
       }
@@ -140,20 +153,20 @@ export class RefactoringAnalyzer {
       braceCount += (line.match(/\{/g) || []).length;
       braceCount -= (line.match(/\}/g) || []).length;
 
-      if (functionStart !== -1 && braceCount === 0 && line.includes('}')) {
+      if (functionStart !== -1 && braceCount === 0 && line.includes("}")) {
         const functionLength = index - functionStart;
 
         if (functionLength > 30) {
           opportunities.push({
-            type: 'LONG_FUNCTION',
+            type: "LONG_FUNCTION",
             description: `Function is ${functionLength} lines long`,
-            priority: 'medium',
+            priority: "medium",
             location: {
               file: filePath,
               line: functionStart + 1,
             },
-            suggestion: 'Break this function into smaller, focused functions',
-            impact: 'Improves code maintainability and testability',
+            suggestion: "Break this function into smaller, focused functions",
+            impact: "Improves code maintainability and testability",
           });
         }
 
@@ -163,17 +176,20 @@ export class RefactoringAnalyzer {
 
     // Check for magic numbers
     lines.forEach((line, index) => {
-      if (/\b\d{3,}\b|\b[1-9]\d{2,}\b/.test(line) && !line.trim().startsWith('//')) {
+      if (
+        /\b\d{3,}\b|\b[1-9]\d{2,}\b/.test(line) &&
+        !line.trim().startsWith("//")
+      ) {
         opportunities.push({
-          type: 'MAGIC_NUMBER',
-          description: 'Magic number found - should be named constant',
-          priority: 'low',
+          type: "MAGIC_NUMBER",
+          description: "Magic number found - should be named constant",
+          priority: "low",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Extract to a named constant: const MAX_RETRIES = 1000;',
-          impact: 'Makes code more maintainable and self-documenting',
+          suggestion: "Extract to a named constant: const MAX_RETRIES = 1000;",
+          impact: "Makes code more maintainable and self-documenting",
         });
       }
     });
@@ -182,64 +198,72 @@ export class RefactoringAnalyzer {
   private findReadabilityOpportunities(
     lines: string[],
     filePath: string,
-    opportunities: RefactoringOpportunity[]
+    opportunities: RefactoringOpportunity[],
   ): void {
     lines.forEach((line, index) => {
       // Check for deeply nested ternary operators
       const ternaryCount = (line.match(/\?/g) || []).length;
       if (ternaryCount > 2) {
         opportunities.push({
-          type: 'COMPLEX_TERNARY',
+          type: "COMPLEX_TERNARY",
           description: `Line has ${ternaryCount} ternary operators - hard to read`,
-          priority: 'medium',
+          priority: "medium",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Convert to if-else statement or helper function',
-          impact: 'Significantly improves code readability',
+          suggestion: "Convert to if-else statement or helper function",
+          impact: "Significantly improves code readability",
           example:
-            '// Instead of: a ? b : c ? d : e ? f : g\n// Use: if (a) return b;\nif (c) return d;\nif (e) return f;\nreturn g;',
+            "// Instead of: a ? b : c ? d : e ? f : g\n// Use: if (a) return b;\nif (c) return d;\nif (e) return f;\nreturn g;",
         });
       }
 
       // Check for very long lines
-      if (line.length > 100 && !line.trim().startsWith('//')) {
+      if (line.length > 100 && !line.trim().startsWith("//")) {
         opportunities.push({
-          type: 'LONG_LINE',
+          type: "LONG_LINE",
           description: `Line is ${line.length} characters - exceeds 100 char limit`,
-          priority: 'low',
+          priority: "low",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Break into multiple lines for better readability',
-          impact: 'Improves code readability and maintainability',
+          suggestion: "Break into multiple lines for better readability",
+          impact: "Improves code readability and maintainability",
         });
       }
 
       // Check for abbreviated variable names
-      if (/\b[a-z]{1,2}\b\s*=/.test(line) && !line.includes('for') && !line.includes('let i')) {
+      if (
+        /\b[a-z]{1,2}\b\s*=/.test(line) &&
+        !line.includes("for") &&
+        !line.includes("let i")
+      ) {
         opportunities.push({
-          type: 'UNCLEAR_NAMING',
-          description: 'Single or double letter variable name - unclear meaning',
-          priority: 'low',
+          type: "UNCLEAR_NAMING",
+          description:
+            "Single or double letter variable name - unclear meaning",
+          priority: "low",
           location: {
             file: filePath,
             line: index + 1,
           },
-          suggestion: 'Use descriptive variable names: let result = ...; instead of let r = ...;',
-          impact: 'Improves code readability and maintainability',
+          suggestion:
+            "Use descriptive variable names: let result = ...; instead of let r = ...;",
+          impact: "Improves code readability and maintainability",
         });
       }
     });
   }
 
-  private countByPriority(opportunities: RefactoringOpportunity[]): Record<string, number> {
+  private countByPriority(
+    opportunities: RefactoringOpportunity[],
+  ): Record<string, number> {
     return {
-      high: opportunities.filter((o) => o.priority === 'high').length,
-      medium: opportunities.filter((o) => o.priority === 'medium').length,
-      low: opportunities.filter((o) => o.priority === 'low').length,
+      high: opportunities.filter((o) => o.priority === "high").length,
+      medium: opportunities.filter((o) => o.priority === "medium").length,
+      low: opportunities.filter((o) => o.priority === "low").length,
     };
   }
 }

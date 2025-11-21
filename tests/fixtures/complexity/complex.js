@@ -4,45 +4,45 @@
 // Cognitive: 25+ (very high)
 function complexValidation(data) {
   if (!data) {
-    return { valid: false, error: 'No data' };
+    return { valid: false, error: "No data" };
   }
 
-  if (data.type === 'user') {
+  if (data.type === "user") {
     if (data.age) {
       if (data.age < 18) {
         if (data.hasParentalConsent) {
           if (data.consentVerified) {
             return { valid: true };
           } else {
-            return { valid: false, error: 'Consent not verified' };
+            return { valid: false, error: "Consent not verified" };
           }
         } else {
-          return { valid: false, error: 'No parental consent' };
+          return { valid: false, error: "No parental consent" };
         }
       } else if (data.age > 100) {
-        return { valid: false, error: 'Invalid age' };
+        return { valid: false, error: "Invalid age" };
       } else {
         return { valid: true };
       }
     } else {
-      return { valid: false, error: 'Age required' };
+      return { valid: false, error: "Age required" };
     }
-  } else if (data.type === 'admin') {
+  } else if (data.type === "admin") {
     if (data.accessLevel) {
       if (data.accessLevel > 5) {
         if (data.twoFactorEnabled) {
           return { valid: true };
         } else {
-          return { valid: false, error: '2FA required for high access' };
+          return { valid: false, error: "2FA required for high access" };
         }
       } else {
         return { valid: true };
       }
     } else {
-      return { valid: false, error: 'Access level required' };
+      return { valid: false, error: "Access level required" };
     }
   } else {
-    return { valid: false, error: 'Unknown type' };
+    return { valid: false, error: "Unknown type" };
   }
 }
 
@@ -62,7 +62,7 @@ function matrixOperation(matrix) {
 
     const row = [];
     for (let j = 0; j < matrix[i].length; j++) {
-      if (typeof matrix[i][j] === 'number') {
+      if (typeof matrix[i][j] === "number") {
         if (matrix[i][j] > 0) {
           if (matrix[i][j] % 2 === 0) {
             row.push(matrix[i][j] * 2);
@@ -89,57 +89,60 @@ function matrixOperation(matrix) {
 // Cognitive: 30+ (extremely complex)
 function processTransaction(transaction) {
   if (!transaction) {
-    throw new Error('No transaction');
+    throw new Error("No transaction");
   }
 
-  if (transaction.type === 'payment') {
+  if (transaction.type === "payment") {
     if (transaction.amount > 0) {
-      if (transaction.currency === 'USD') {
+      if (transaction.currency === "USD") {
         if (transaction.amount > 10000) {
           if (transaction.verified) {
-            if (transaction.method === 'card') {
-              if (transaction.cardType === 'credit') {
-                if (transaction.limit && transaction.amount <= transaction.limit) {
+            if (transaction.method === "card") {
+              if (transaction.cardType === "credit") {
+                if (
+                  transaction.limit &&
+                  transaction.amount <= transaction.limit
+                ) {
                   return processPayment(transaction);
                 } else {
-                  return { error: 'Exceeds limit' };
+                  return { error: "Exceeds limit" };
                 }
-              } else if (transaction.cardType === 'debit') {
+              } else if (transaction.cardType === "debit") {
                 if (transaction.balance >= transaction.amount) {
                   return processPayment(transaction);
                 } else {
-                  return { error: 'Insufficient funds' };
+                  return { error: "Insufficient funds" };
                 }
               } else {
-                return { error: 'Unknown card type' };
+                return { error: "Unknown card type" };
               }
-            } else if (transaction.method === 'bank') {
+            } else if (transaction.method === "bank") {
               if (transaction.accountVerified) {
                 return processBankTransfer(transaction);
               } else {
-                return { error: 'Account not verified' };
+                return { error: "Account not verified" };
               }
             } else {
-              return { error: 'Unknown payment method' };
+              return { error: "Unknown payment method" };
             }
           } else {
-            return { error: 'Transaction not verified' };
+            return { error: "Transaction not verified" };
           }
         } else {
           return processSmallPayment(transaction);
         }
-      } else if (transaction.currency === 'EUR') {
+      } else if (transaction.currency === "EUR") {
         return processEuroPayment(transaction);
       } else {
-        return { error: 'Unsupported currency' };
+        return { error: "Unsupported currency" };
       }
     } else {
-      return { error: 'Invalid amount' };
+      return { error: "Invalid amount" };
     }
-  } else if (transaction.type === 'refund') {
+  } else if (transaction.type === "refund") {
     return processRefund(transaction);
   } else {
-    return { error: 'Unknown transaction type' };
+    return { error: "Unknown transaction type" };
   }
 }
 

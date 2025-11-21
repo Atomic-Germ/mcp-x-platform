@@ -18,7 +18,7 @@ class EventManager {
 // Pattern 2: Closure capturing large objects
 function createProcessor() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const hugeData = new Array(1000000).fill('data');
+  const hugeData = new Array(1000000).fill("data");
 
   return function process(item) {
     // Closure keeps hugeData in memory even if not used
@@ -39,7 +39,7 @@ function startPolling() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const intervalId = setInterval(() => {
     // eslint-disable-next-line no-console
-    console.log('Polling...');
+    console.log("Polling...");
   }, 1000);
   // intervalId never cleared - memory leak!
 }
@@ -53,8 +53,8 @@ function cacheData(key, value) {
 
 // Pattern 6: Circular references
 function createCircular() {
-  const obj1 = { name: 'obj1' };
-  const obj2 = { name: 'obj2' };
+  const obj1 = { name: "obj1" };
+  const obj2 = { name: "obj2" };
 
   obj1.ref = obj2;
   obj2.ref = obj1;

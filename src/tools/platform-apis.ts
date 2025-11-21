@@ -1,6 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { PlatformAPIAnalyzer } from '../analyzers/platform-api-analyzer';
+import * as fs from "fs";
+import * as path from "path";
+import { PlatformAPIAnalyzer } from "../analyzers/platform-api-analyzer";
 
 export interface DetectPlatformAPIsInput {
   path: string;
@@ -21,7 +21,7 @@ export interface DetectPlatformAPIsResult {
 }
 
 export async function detectPlatformAPIs(
-  input: DetectPlatformAPIsInput
+  input: DetectPlatformAPIsInput,
 ): Promise<DetectPlatformAPIsResult> {
   const analyzer = new PlatformAPIAnalyzer();
   const allIssues: any[] = [];
@@ -31,7 +31,7 @@ export async function detectPlatformAPIs(
 
   for (const filePath of filesToAnalyze) {
     try {
-      const code = fs.readFileSync(filePath, 'utf-8');
+      const code = fs.readFileSync(filePath, "utf-8");
       const issues = analyzer.analyze(code, filePath);
       allIssues.push(...issues);
       totalFiles++;
@@ -52,8 +52,8 @@ export async function detectPlatformAPIs(
 
   for (const issue of allIssues) {
     bySeverity[issue.severity]++;
-    
-    const platforms = issue.platform.split(', ');
+
+    const platforms = issue.platform.split(", ");
     for (const platform of platforms) {
       byPlatform[platform] = (byPlatform[platform] || 0) + 1;
     }
@@ -61,15 +61,23 @@ export async function detectPlatformAPIs(
 
   // Generate recommendations
   const recommendations: string[] = [];
-  
+
   if (allIssues.length > 0) {
-    recommendations.push('Use feature detection and provide fallbacks for platform-specific APIs');
-    recommendations.push('Consider using cross-platform libraries like "cross-spawn" for child processes');
-    recommendations.push('Add platform checks: if (process.platform === \'win32\') { ... }');
+    recommendations.push(
+      "Use feature detection and provide fallbacks for platform-specific APIs",
+    );
+    recommendations.push(
+      'Consider using cross-platform libraries like "cross-spawn" for child processes',
+    );
+    recommendations.push(
+      "Add platform checks: if (process.platform === 'win32') { ... }",
+    );
   }
 
   if (bySeverity.high > 0 || bySeverity.critical > 0) {
-    recommendations.push('HIGH PRIORITY: Address critical and high-severity platform issues first');
+    recommendations.push(
+      "HIGH PRIORITY: Address critical and high-severity platform issues first",
+    );
   }
 
   return {
@@ -105,7 +113,11 @@ function collectFiles(targetPath: string, includeTests: boolean): string[] {
   return files;
 }
 
-function traverseDirectory(dirPath: string, files: string[], includeTests: boolean): void {
+function traverseDirectory(
+  dirPath: string,
+  files: string[],
+  includeTests: boolean,
+): void {
   try {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
@@ -134,14 +146,24 @@ function traverseDirectory(dirPath: string, files: string[], includeTests: boole
 
 function isAnalyzableFile(fileName: string): boolean {
   const ext = path.extname(fileName);
-  return ['.js', '.ts', '.jsx', '.tsx', '.mjs', '.cjs'].includes(ext);
+  return [".js", ".ts", ".jsx", ".tsx", ".mjs", ".cjs"].includes(ext);
 }
 
 function isTestFile(fileName: string): boolean {
-  return /\.(test|spec)\.(js|ts|jsx|tsx)$/.test(fileName) || fileName.includes('__tests__');
+  return (
+    /\.(test|spec)\.(js|ts|jsx|tsx)$/.test(fileName) ||
+    fileName.includes("__tests__")
+  );
 }
 
 function shouldSkipDirectory(dirName: string): boolean {
-  const skipDirs = ['node_modules', 'dist', 'build', 'coverage', '.git', '.vscode'];
+  const skipDirs = [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".git",
+    ".vscode",
+  ];
   return skipDirs.includes(dirName);
 }

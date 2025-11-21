@@ -11,7 +11,7 @@ function validateUser(user) {
     return false;
   }
 
-  if (!user.email || !user.email.includes('@')) {
+  if (!user.email || !user.email.includes("@")) {
     return false;
   }
 
@@ -22,11 +22,11 @@ function validateUser(user) {
 // Cognitive: ~3
 function getDiscount(memberType) {
   switch (memberType) {
-    case 'gold':
+    case "gold":
       return 0.2;
-    case 'silver':
+    case "silver":
       return 0.15;
-    case 'bronze':
+    case "bronze":
       return 0.1;
     default:
       return 0;

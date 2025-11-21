@@ -53,13 +53,13 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 
 ## Core Tools
 
-| Tool | Purpose |
-|------|---------|
-| `detect_platform_apis` | Detect platform-specific API calls |
-| `analyze_file_paths` | Analyze file paths for compatibility |
-| `analyze_line_endings` | Check line ending consistency |
-| `analyze_shell_commands` | Analyze shell command compatibility |
-| `generate_compatibility_report` | Generate comprehensive reports |
+| Tool                            | Purpose                              |
+| ------------------------------- | ------------------------------------ |
+| `detect_platform_apis`          | Detect platform-specific API calls   |
+| `analyze_file_paths`            | Analyze file paths for compatibility |
+| `analyze_line_endings`          | Check line ending consistency        |
+| `analyze_shell_commands`        | Analyze shell command compatibility  |
+| `generate_compatibility_report` | Generate comprehensive reports       |
 
 ## Usage Examples
 
@@ -91,16 +91,18 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 ## Best Practices
 
 ### File Paths
+
 ```typescript
 // ✅ GOOD
-import * as path from 'path';
-const filePath = path.join('src', 'utils', 'helper.js');
+import * as path from "path";
+const filePath = path.join("src", "utils", "helper.js");
 
 // ❌ BAD
-const filePath = 'src\\utils\\helper.js';
+const filePath = "src\\utils\\helper.js";
 ```
 
 ### Line Endings
+
 ```bash
 # .gitattributes
 * text=auto eol=lf
@@ -109,13 +111,14 @@ const filePath = 'src\\utils\\helper.js';
 ```
 
 ### Shell Commands
+
 ```typescript
 // ✅ GOOD - Cross-platform
-import { rimraf } from 'rimraf';
-await rimraf('./temp');
+import { rimraf } from "rimraf";
+await rimraf("./temp");
 
 // ❌ BAD - Platform-specific
-exec('rm -rf ./temp');
+exec("rm -rf ./temp");
 ```
 
 ## Development

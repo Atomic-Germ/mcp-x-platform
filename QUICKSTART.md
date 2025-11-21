@@ -59,6 +59,7 @@ Add the server:
 ### Other MCP Clients
 
 Use these connection details:
+
 - **Command**: `node`
 - **Args**: `["/path/to/mcp-optimist/dist/index.js"]`
 - **Protocol**: stdio
@@ -113,20 +114,20 @@ Suggest Fixes: true
 ✅ **Tools Listed**: All 8 optimization tools are available  
 ✅ **Analysis Runs**: Tools execute without errors  
 ✅ **Results Format**: Consistent response structure  
-✅ **File Processing**: Can analyze your codebase  
+✅ **File Processing**: Can analyze your codebase
 
 ## Available Tools
 
-| Tool | Purpose |
-|------|---------|
-| `analyze_performance` | Find performance bottlenecks |
-| `optimize_memory` | Detect memory leaks and inefficiencies |
-| `analyze_complexity` | Measure code complexity metrics |
-| `detect_code_smells` | Identify anti-patterns and quality issues |
-| `analyze_dependencies` | Analyze dependency graphs |
-| `find_dead_code` | Locate unused code |
-| `optimize_hot_paths` | Optimize frequently executed code |
-| `suggest_refactoring` | Get AI-powered refactoring suggestions |
+| Tool                   | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| `analyze_performance`  | Find performance bottlenecks              |
+| `optimize_memory`      | Detect memory leaks and inefficiencies    |
+| `analyze_complexity`   | Measure code complexity metrics           |
+| `detect_code_smells`   | Identify anti-patterns and quality issues |
+| `analyze_dependencies` | Analyze dependency graphs                 |
+| `find_dead_code`       | Locate unused code                        |
+| `optimize_hot_paths`   | Optimize frequently executed code         |
+| `suggest_refactoring`  | Get AI-powered refactoring suggestions    |
 
 ## Common Issues
 
@@ -183,6 +184,7 @@ Create `optimist.config.json` in your project root:
 ## Integration with Other Tools
 
 Optimist works great with:
+
 - **mcp-consult** - Get AI consultation on optimization strategies
 - **mcp-tdd** - Apply optimizations using test-driven development
 - **Your IDE** - Use analysis results to guide refactoring
@@ -251,12 +253,12 @@ mcp-optimist/
 ### Programmatically
 
 ```typescript
-import { OptimistServer } from './src/server';
+import { OptimistServer } from "./src/server";
 
 // Create server instance
 const server = new OptimistServer({
   maxComplexity: 15,
-  analysisDepth: 'deep'
+  analysisDepth: "deep",
 });
 
 // Get server info
@@ -317,14 +319,14 @@ node --inspect-brk node_modules/.bin/jest --runInBand
 
 ```typescript
 // tests/unit/tools/performance.test.ts
-import { PerformanceAnalyzer } from '../../../src/analyzers/performance';
+import { PerformanceAnalyzer } from "../../../src/analyzers/performance";
 
-describe('PerformanceAnalyzer', () => {
-  it('should detect slow loops', async () => {
+describe("PerformanceAnalyzer", () => {
+  it("should detect slow loops", async () => {
     const analyzer = new PerformanceAnalyzer();
-    const result = await analyzer.analyze('./fixtures/slow-loop.js');
+    const result = await analyzer.analyze("./fixtures/slow-loop.js");
     expect(result.findings).toHaveLength(1);
-    expect(result.findings[0].type).toBe('SLOW_LOOP');
+    expect(result.findings[0].type).toBe("SLOW_LOOP");
   });
 });
 ```
@@ -337,19 +339,19 @@ export class PerformanceAnalyzer {
   async analyze(path: string): Promise<AnalysisResult> {
     // Implementation here
     return {
-      status: 'success',
-      tool: 'analyze_performance',
+      status: "success",
+      tool: "analyze_performance",
       data: {
-        summary: 'Analysis complete',
+        summary: "Analysis complete",
         findings: [],
         suggestions: [],
-        metrics: {}
+        metrics: {},
       },
       metadata: {
         timestamp: new Date().toISOString(),
         duration: 0,
-        filesAnalyzed: 0
-      }
+        filesAnalyzed: 0,
+      },
     };
   }
 }
@@ -365,6 +367,7 @@ export class PerformanceAnalyzer {
 ## Troubleshooting
 
 ### Tests Not Running
+
 ```bash
 # Clear Jest cache
 npm test -- --clearCache
@@ -375,6 +378,7 @@ npm install
 ```
 
 ### Build Errors
+
 ```bash
 # Check TypeScript version
 npx tsc --version
@@ -385,6 +389,7 @@ npm run build
 ```
 
 ### MCP Connection Issues
+
 - Ensure the path in Claude Desktop config is absolute
 - Check that `dist/index.js` exists after building
 - Look at Claude Desktop logs for errors
@@ -409,4 +414,4 @@ npm run build
 
 ---
 
-*Built with Test-Driven Development and the Model Context Protocol*
+_Built with Test-Driven Development and the Model Context Protocol_

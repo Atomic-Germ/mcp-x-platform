@@ -1,12 +1,12 @@
-import { AnalysisResult, Finding, Suggestion } from '../types';
-import { RefactoringAnalyzer } from '../analyzers/refactoring-analyzer';
-import * as fs from 'fs';
-import * as path from 'path';
+import { AnalysisResult, Finding, Suggestion } from "../types";
+import { RefactoringAnalyzer } from "../analyzers/refactoring-analyzer";
+import * as fs from "fs";
+import * as path from "path";
 
 interface RefactoringOpportunity {
   type: string;
   description: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: "low" | "medium" | "high";
   location: {
     file: string;
     line?: number;
@@ -29,16 +29,21 @@ export class RefactoringSuggester {
   /**
    * Analyze a file or directory for refactoring opportunities
    */
-  async analyze(filePath: string, options: { focusArea?: string } = {}): Promise<AnalysisResult> {
+  async analyze(
+    filePath: string,
+    options: { focusArea?: string } = {},
+  ): Promise<AnalysisResult> {
     const startTime = Date.now();
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
     // Normalize focusArea with fallback to 'all' for invalid values
     const focusArea = (
-      ['performance', 'maintainability', 'readability', 'all'].includes(options.focusArea || '')
+      ["performance", "maintainability", "readability", "all"].includes(
+        options.focusArea || "",
+      )
         ? options.focusArea
-        : 'all'
-    ) as 'performance' | 'maintainability' | 'readability' | 'all';
+        : "all"
+    ) as "performance" | "maintainability" | "readability" | "all";
     let filesAnalyzed = 0;
 
     try {
@@ -69,7 +74,11 @@ export class RefactoringSuggester {
           findings.push({
             type: opp.type,
             severity:
-              opp.priority === 'high' ? 'high' : opp.priority === 'medium' ? 'medium' : 'low',
+              opp.priority === "high"
+                ? "high"
+                : opp.priority === "medium"
+                  ? "medium"
+                  : "low",
             location: opp.location,
             message: opp.description,
             code: opp.type,
@@ -90,9 +99,10 @@ export class RefactoringSuggester {
       const metrics = {
         totalOpportunities: allOpportunities.length,
         byPriority: {
-          high: allOpportunities.filter((o) => o.priority === 'high').length,
-          medium: allOpportunities.filter((o) => o.priority === 'medium').length,
-          low: allOpportunities.filter((o) => o.priority === 'low').length,
+          high: allOpportunities.filter((o) => o.priority === "high").length,
+          medium: allOpportunities.filter((o) => o.priority === "medium")
+            .length,
+          low: allOpportunities.filter((o) => o.priority === "low").length,
         },
         byType: this.groupByType(allOpportunities),
         focusArea,
@@ -101,8 +111,8 @@ export class RefactoringSuggester {
       const duration = Date.now() - startTime;
 
       return {
-        status: 'success',
-        tool: 'suggest_refactoring',
+        status: "success",
+        tool: "suggest_refactoring",
         data: {
           summary: this.generateSummary(allOpportunities, focusArea),
           findings,
@@ -117,11 +127,12 @@ export class RefactoringSuggester {
       };
     } catch (error) {
       const duration = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
       return {
-        status: 'error',
-        tool: 'suggest_refactoring',
+        status: "error",
+        tool: "suggest_refactoring",
         data: {
           summary: `Error analyzing files: ${errorMessage}`,
           findings: [],
@@ -145,7 +156,11 @@ export class RefactoringSuggester {
         const fullPath = path.join(dir, entry.name);
 
         // Skip node_modules, dist, coverage
-        if (['node_modules', 'dist', 'coverage', '.git', 'build'].includes(entry.name)) {
+        if (
+          ["node_modules", "dist", "coverage", ".git", "build"].includes(
+            entry.name,
+          )
+        ) {
           continue;
         }
 
@@ -160,7 +175,9 @@ export class RefactoringSuggester {
     }
   }
 
-  private groupByType(opportunities: RefactoringOpportunity[]): Record<string, number> {
+  private groupByType(
+    opportunities: RefactoringOpportunity[],
+  ): Record<string, number> {
     const groups: Record<string, number> = {};
 
     opportunities.forEach((opp) => {
@@ -170,20 +187,23 @@ export class RefactoringSuggester {
     return groups;
   }
 
-  private generateSummary(opportunities: RefactoringOpportunity[], focusArea: string): string {
+  private generateSummary(
+    opportunities: RefactoringOpportunity[],
+    focusArea: string,
+  ): string {
     if (opportunities.length === 0) {
       return `Refactoring analysis complete (focus: ${focusArea}). No refactoring opportunities identified. Code is well-structured!`;
     }
 
-    const high = opportunities.filter((o) => o.priority === 'high').length;
-    const medium = opportunities.filter((o) => o.priority === 'medium').length;
-    const low = opportunities.filter((o) => o.priority === 'low').length;
+    const high = opportunities.filter((o) => o.priority === "high").length;
+    const medium = opportunities.filter((o) => o.priority === "medium").length;
+    const low = opportunities.filter((o) => o.priority === "low").length;
 
     const parts = [];
     if (high > 0) parts.push(`${high} high-priority`);
     if (medium > 0) parts.push(`${medium} medium-priority`);
     if (low > 0) parts.push(`${low} low-priority`);
 
-    return `Found ${opportunities.length} refactoring opportunity/opportunities (${parts.join(', ')}) focused on ${focusArea} improvements.`;
+    return `Found ${opportunities.length} refactoring opportunity/opportunities (${parts.join(", ")}) focused on ${focusArea} improvements.`;
   }
 }

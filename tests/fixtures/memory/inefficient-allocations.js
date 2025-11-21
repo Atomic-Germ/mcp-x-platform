@@ -25,7 +25,7 @@ function createManyObjects(count) {
         data: new Array(100).fill(i),
         metadata: {
           created: new Date(),
-          tags: ['tag1', 'tag2', 'tag3'],
+          tags: ["tag1", "tag2", "tag3"],
         },
       });
     }
@@ -36,12 +36,12 @@ function createManyObjects(count) {
 
 // Pattern 3: String concatenation (memory churn)
 function buildLargeString(items) {
-  let result = '';
+  let result = "";
 
   for (let i = 0; i < items.length; i++) {
     // Each concatenation creates new string
     result += items[i].toString();
-    result += '\n';
+    result += "\n";
   }
 
   return result;

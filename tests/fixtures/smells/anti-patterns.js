@@ -19,7 +19,7 @@ function createUser(
   timezone,
   newsletter,
   terms,
-  privacy
+  privacy,
 ) {
   return {
     firstName,
@@ -46,9 +46,9 @@ function createUser(
 // Long method
 function processOrder(order) {
   // Validate order
-  if (!order) throw new Error('No order');
-  if (!order.items) throw new Error('No items');
-  if (!order.customer) throw new Error('No customer');
+  if (!order) throw new Error("No order");
+  if (!order.items) throw new Error("No items");
+  if (!order.customer) throw new Error("No customer");
 
   // Calculate totals
   let subtotal = 0;
@@ -85,7 +85,7 @@ function processOrder(order) {
     if (product) {
       product.stock -= item.quantity;
       if (product.stock < 0) {
-        throw new Error('Out of stock');
+        throw new Error("Out of stock");
       }
     }
   }
@@ -93,15 +93,15 @@ function processOrder(order) {
   // Send notifications
   sendEmailToCustomer(order.customer.email, total);
   sendNotificationToWarehouse(order.items);
-  updateAnalytics('order_processed', total);
+  updateAnalytics("order_processed", total);
 
   // Log everything
   // eslint-disable-next-line no-console
-  console.log('Order processed:', order.id);
+  console.log("Order processed:", order.id);
   // eslint-disable-next-line no-console
-  console.log('Total:', total);
+  console.log("Total:", total);
   // eslint-disable-next-line no-console
-  console.log('Items:', order.items.length);
+  console.log("Items:", order.items.length);
 
   return { subtotal, discount, tax, shipping, total };
 }
@@ -138,15 +138,15 @@ function riskyOperation() {
 
 // Type checking anti-pattern
 function handleValue(value) {
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value.toUpperCase();
-  } else if (typeof value === 'number') {
+  } else if (typeof value === "number") {
     return value * 2;
-  } else if (typeof value === 'boolean') {
+  } else if (typeof value === "boolean") {
     return !value;
   } else if (Array.isArray(value)) {
     return value.length;
-  } else if (typeof value === 'object') {
+  } else if (typeof value === "object") {
     return Object.keys(value).length;
   }
   return null;
